@@ -8,9 +8,12 @@ Juegos clásicos para el navegador, con tabla de posiciones global, hechos con H
 |---|---|---|
 | **Snake** | Flechas/WASD o deslizar; espacio para pausar | puntos (10 por estrella) |
 | **3 en raya** | Contra la compu (fácil o imposible, con minimax) o de a dos | marcador local |
-| **Blackjack** | Apuesta, pide, plántate o dobla. Fichas de juego, sin dinero real | máximo de fichas |
+| **Blackjack** | Apuesta, pide, plántate o dobla. Con TukiPoints, sin dinero real | máximo de TukiPoints |
+| **Ruleta** | Ruleta europea: plenos, colores, par/impar, mitades y docenas. Con TukiPoints | mayor premio en una tirada |
 | **2048** | Flechas/WASD o deslizar; con deshacer | puntos |
 | **Buscaminas** | Clic para descubrir, clic derecho o mantener presionado para bandera | mejor tiempo (fácil y medio) |
+
+**TukiPoints** es la moneda de la sala: un solo saldo para Blackjack y Ruleta, guardado en el navegador (`api.tukipoints`). Se empieza con 1.000 y se puede recargar al quedar en cero. No hay dinero real.
 
 Todo funciona en el celular (controles táctiles y botones en pantalla), tiene tema día/noche y guarda los récords en el navegador. Si la tabla de posiciones no está disponible, los juegos siguen funcionando.
 
@@ -56,11 +59,12 @@ node test/e2e-juegos.mjs http://127.0.0.1:8787 capturas
 public/            la sala y los juegos (archivos estáticos)
   index.html       sala, juego activo y panel de posiciones
   juegos.js        núcleo: navegación, récords, controles táctiles, tabla de posiciones
-  snake.js · gato.js · blackjack.js · 2048.js · buscaminas.js
+  snake.js · gato.js · blackjack.js · ruleta.js · 2048.js · buscaminas.js
   juegos.css · base.css · tema.js
 worker/index.js    API de posiciones (D1) y archivos estáticos
+worker/filtro.js   filtro de nombres groseros
 wrangler.jsonc     configuración de Cloudflare
-test/              prueba de punta a punta con Playwright
+test/              prueba de punta a punta con Playwright y prueba del filtro
 ```
 
 ### Agregar un juego
@@ -90,6 +94,7 @@ Para que acepte puntajes, agrega su clave con el mínimo y el máximo en `TABLAS
 
 **Reglas del servidor:**
 - Nombres de 2 a 16 caracteres, solo letras, números, espacio, punto y guiones.
+- Sin nombres groseros (`worker/filtro.js`, en español de Chile y en inglés). Se rechazan al anotar y los que ya estaban guardados no se muestran. Para agregar palabras, edita las listas del archivo y corre `node test/filtro.mjs`.
 - Puntajes dentro del rango de cada juego.
 - Un envío por juego cada 15 segundos por visitante. Se guarda solo una huella de la IP, nunca la IP.
 

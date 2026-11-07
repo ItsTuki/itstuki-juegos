@@ -44,6 +44,25 @@ var Juegos = (function(){
     return { record: mejora ? puntos : previo, nuevo: mejora && previo !== null };
   }
 
+  /* ---------- TukiPoints: la moneda de la sala (sin dinero real) ----------
+     Un solo saldo para todos los juegos de apuestas (Blackjack y Ruleta), guardado en este navegador.
+     Si venías del Blackjack anterior, tus fichas pasan a ser TukiPoints. */
+  var TP_INICIAL = 1000;
+  var tukipoints = {
+    inicial: TP_INICIAL,
+    saldo: function(){
+      var v = leer("tukipoints", null);
+      if (typeof v === "number" && isFinite(v) && v >= 0) return Math.floor(v);
+      var viejo = leer("blackjack:fichas", null);
+      v = typeof viejo === "number" && isFinite(viejo) && viejo >= 0 ? Math.floor(viejo) : TP_INICIAL;
+      guardar("tukipoints", v);
+      try { localStorage.removeItem("juegos:blackjack:fichas"); } catch (e) {}
+      return v;
+    },
+    guardar: function(n){ guardar("tukipoints", Math.max(0, Math.floor(n))); },
+    texto: function(n){ return miles(n) + " TukiPoints"; }
+  };
+
   /* ---------- Controles táctiles ---------- */
   function deslizar(elemento, cb){
     var x0 = 0, y0 = 0, activo = false;
@@ -169,7 +188,7 @@ var Juegos = (function(){
   function mostrarTabla(clave){ if (juegoActual){ panel.clave = clave; pintarPanel(juegoActual); } }
 
   var api = { el: el, aviso: aviso, miles: miles, leer: leer, guardar: guardar, record: record, deslizar: deslizar, cruceta: cruceta, TECLAS: TECLAS,
-    ofrecerGuardar: ofrecerGuardar, mostrarTabla: mostrarTabla };
+    ofrecerGuardar: ofrecerGuardar, mostrarTabla: mostrarTabla, tukipoints: tukipoints };
 
   function registrar(juego){ lista.push(juego); }
 
@@ -189,6 +208,12 @@ var Juegos = (function(){
         el("span", { clase: "record-juego", texto: (j.resumen && j.resumen(api)) || "sin récord todavía" })
       ]) ]));
     });
+    var saldoSala = $("#saldo-sala");
+    if (saldoSala){
+      saldoSala.textContent = "";
+      saldoSala.append("Tus TukiPoints: ", el("b", { texto: miles(tukipoints.saldo()) }), " · se usan en Blackjack y Ruleta, sin dinero real.");
+      saldoSala.hidden = false;
+    }
     var todas = []; lista.forEach(function(j){ (j.tablas || []).forEach(function(t){ todas.push(t); }); });
     var cont = $("#posiciones-sala"); cont.textContent = "";
     if (!todas.length) return;

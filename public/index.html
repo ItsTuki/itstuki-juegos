@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>✦ Sala de juegos · ItsTuki ✦</title>
-<meta name="description" content="Juegos para el navegador con tabla de posiciones: Snake, 3 en raya, Blackjack, 2048 y Buscaminas.">
+<meta name="description" content="Juegos para el navegador con tabla de posiciones: Snake, 3 en raya, Blackjack, Ruleta, 2048 y Buscaminas. Se juega con TukiPoints, sin dinero real.">
 <meta name="theme-color" content="#120f2e">
 <link rel="canonical" href="https://juegos.itstuki.cl/">
 <link rel="icon" type="image/png" href="/favicon.png">
@@ -41,6 +41,7 @@
         <h1 class="widget-titulo" id="t-sala">~ sala de juegos <span class="puntos" aria-hidden="true"><i></i><i></i></span></h1>
         <div class="widget-cuerpo">
           <p>Elige un juego. Se juega con el teclado o con el dedo, tu récord queda guardado en este navegador y los mejores puntajes entran a la <em>tabla de posiciones</em>.</p>
+          <p class="saldo-sala" id="saldo-sala" hidden></p>
         </div>
       </div>
       <ul class="tarjetas-juego" id="tarjetas-juego"></ul>
@@ -79,6 +80,7 @@
 <script src="/snake.js"></script>
 <script src="/gato.js"></script>
 <script src="/blackjack.js"></script>
+<script src="/ruleta.js"></script>
 <script src="/2048.js"></script>
 <script src="/buscaminas.js"></script>
 <script src="/iniciar.js"></script>

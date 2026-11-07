@@ -1,19 +1,19 @@
-/* Blackjack con fichas de juego (sin dinero real).
+/* Blackjack con TukiPoints, la moneda de la sala (sin dinero real).
    Reglas: el crupier pide hasta 17 y se planta en 17 suave; blackjack paga 3 a 2; se puede doblar con 2 cartas.
-   La tabla de posiciones guarda el máximo de fichas que alcanzaste. */
+   El saldo es el mismo de la Ruleta (api.tukipoints). La tabla guarda el máximo de TukiPoints que alcanzaste aquí. */
 Juegos.registrar({
   id: "blackjack",
   nombre: "Blackjack",
-  descripcion: "Llega a 21 sin pasarte. Fichas de juego, sin dinero real.",
+  descripcion: "Llega a 21 sin pasarte. Se juega con TukiPoints, sin dinero real.",
   icono: "♠",
-  tablas: [{ clave: "blackjack", nombre: "Blackjack", menorEsMejor: false, formato: function(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ".") + " fichas"; } }],
-  resumen: function(api){ var r = api.leer("record:blackjack", null); return r === null ? null : "Máximo: " + api.miles(r) + " fichas"; },
+  tablas: [{ clave: "blackjack", nombre: "Blackjack", menorEsMejor: false, formato: function(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ".") + " TukiPoints"; } }],
+  resumen: function(api){ var r = api.leer("record:blackjack", null); return r === null ? null : "Máximo: " + api.tukipoints.texto(r); },
   montar: function(cont, api){
     "use strict";
-    var el = api.el, INICIAL = 1000;
+    var el = api.el, TP = api.tukipoints, INICIAL = TP.inicial;
     var PALOS = [["♠", "negro"], ["♥", "rojo"], ["♦", "rojo"], ["♣", "negro"]];
     var VALORES = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
-    var fichas = api.leer("blackjack:fichas", INICIAL), apuesta = Math.min(50, fichas), mazo = [], jugador = [], crupier = [], fase = "apostar", doblada = false;
+    var fichas = TP.saldo(), apuesta = Math.min(50, fichas), mazo = [], jugador = [], crupier = [], fase = "apostar", doblada = false;
 
     var fichasEl = el("b"), apuestaEl = el("b");
     var manoCrupier = el("div", { clase: "mano", "aria-label": "Cartas del crupier" }), totalCrupier = el("span", { clase: "total-mano" });
@@ -21,14 +21,14 @@ Juegos.registrar({
     var estadoEl = el("p", { clase: "estado-juego", "aria-live": "polite" });
     var controles = el("div", { clase: "fila-botones centrado controles-bj" });
 
-    cont.appendChild(el("div", { clase: "marcador" }, [ el("span", null, ["Fichas ", fichasEl]), el("span", null, ["Apuesta ", apuestaEl]) ]));
+    cont.appendChild(el("div", { clase: "marcador" }, [ el("span", null, ["TukiPoints ", fichasEl]), el("span", null, ["Apuesta ", apuestaEl]) ]));
     cont.appendChild(el("div", { clase: "mesa" }, [
       el("div", { clase: "lado-mesa" }, [ el("h3", null, ["Crupier ", totalCrupier]), manoCrupier ]),
       el("div", { clase: "lado-mesa" }, [ el("h3", null, ["Tú ", totalJugador]), manoJugador ])
     ]));
     cont.appendChild(estadoEl);
     cont.appendChild(controles);
-    cont.appendChild(el("p", { clase: "ayuda-juego", texto: "El crupier pide hasta 17. Blackjack paga 3 a 2. Fichas de juego: no hay dinero real." }));
+    cont.appendChild(el("p", { clase: "ayuda-juego", texto: "El crupier pide hasta 17. Blackjack paga 3 a 2. Se juega con TukiPoints: no hay dinero real." }));
 
     function nuevoMazo(){
       mazo = [];
@@ -61,8 +61,8 @@ Juegos.registrar({
         });
         controles.appendChild(el("button", { type: "button", clase: "boton secundario chico", texto: "Limpiar", onclick: function(){ apuesta = 0; pintar(); } }));
         controles.appendChild(el("button", { type: "button", clase: "boton", texto: "Repartir", disabled: apuesta < 10 || apuesta > fichas, onclick: repartir }));
-        if (fichas < 10) controles.appendChild(el("button", { type: "button", clase: "boton", texto: "Recargar 1.000 fichas", onclick: function(){ fichas = INICIAL; apuesta = 50; guardarFichas(); estadoEl.textContent = "Fichas recargadas. ¡Suerte!"; pintar(); } }));
-        if (fichas > INICIAL) controles.appendChild(el("button", { type: "button", clase: "boton secundario chico", texto: "Anotar mis fichas", onclick: function(){ api.ofrecerGuardar("blackjack", fichas); } }));
+        if (fichas < 10) controles.appendChild(el("button", { type: "button", clase: "boton", texto: "Recargar " + TP.texto(INICIAL), onclick: function(){ fichas = INICIAL; apuesta = 50; guardarFichas(); estadoEl.textContent = "TukiPoints recargados. ¡Suerte!"; pintar(); } }));
+        if (fichas > INICIAL) controles.appendChild(el("button", { type: "button", clase: "boton secundario chico", texto: "Anotar mis TukiPoints", onclick: function(){ api.ofrecerGuardar("blackjack", fichas); } }));
       } else if (fase === "jugar"){
         controles.appendChild(el("button", { type: "button", clase: "boton", texto: "Pedir", onclick: pedir }));
         controles.appendChild(el("button", { type: "button", clase: "boton secundario", texto: "Plantarse", onclick: plantarse }));
@@ -70,7 +70,7 @@ Juegos.registrar({
       }
     }
     function guardarFichas(){
-      api.guardar("blackjack:fichas", fichas);
+      TP.guardar(fichas);
       var r = api.record("blackjack", fichas, false);
       return r;
     }
@@ -107,9 +107,9 @@ Juegos.registrar({
       apuesta = Math.min(apuesta, fichas);
       var r = guardarFichas();
       fase = "fin";
-      estadoEl.textContent = texto + (fichas < 10 ? " Te quedaste sin fichas." : "");
+      estadoEl.textContent = texto + (fichas < 10 ? " Te quedaste sin TukiPoints." : "");
       pintar();
-      if (r.nuevo && fichas > INICIAL) { api.aviso("¡Nuevo máximo: " + api.miles(fichas) + " fichas!"); api.ofrecerGuardar("blackjack", fichas); }
+      if (r.nuevo && fichas > INICIAL) { api.aviso("¡Nuevo máximo: " + TP.texto(fichas) + "!"); api.ofrecerGuardar("blackjack", fichas); }
     }
     function tecla(e){
       if (e.target.tagName === "INPUT") return;
@@ -118,7 +118,7 @@ Juegos.registrar({
     }
     document.addEventListener("keydown", tecla);
     nuevoMazo();
-    estadoEl.textContent = "Elige tu apuesta y reparte. Empiezas con 1.000 fichas.";
+    estadoEl.textContent = fichas === INICIAL ? "Elige tu apuesta y reparte. Empiezas con " + TP.texto(INICIAL) + "." : "Elige tu apuesta y reparte.";
     pintar();
     return function(){ document.removeEventListener("keydown", tecla); };
   }

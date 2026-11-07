@@ -150,3 +150,51 @@
 .contador-mini b.sale{animation:digito-sale .45s cubic-bezier(.2,.8,.3,1) forwards}
 @keyframes digito-entra{from{transform:translateY(100%)}}
 @keyframes digito-sale{to{transform:translateY(-100%)}}
+
+/* Ruleta */
+.icono-ruleta{background:linear-gradient(135deg,#c0162f,#1d1745)}
+.saldo-sala{margin-top:.6rem;font-weight:800;color:var(--texto)}
+.saldo-sala b{font:400 1.5rem/1 var(--pixel);color:var(--chispa)}
+.mesa-ruleta{width:100%;display:grid;justify-items:center;gap:.7rem;padding:1rem;border-radius:var(--radio);border:3px solid #0b3d24;background:radial-gradient(ellipse at center,#1f8a50 0%,#14663b 70%)}
+.marco-rueda{position:relative;width:min(100%,250px);aspect-ratio:1}
+.rueda{display:block;width:100%;height:100%;filter:drop-shadow(3px 4px 0 rgba(0,0,0,.35))}
+.disco{transform-origin:100px 100px;transform-box:view-box}
+.casilla-rueda{stroke:#e9d48a;stroke-width:.6}
+.casilla-rueda.rojo{fill:#c0162f}.casilla-rueda.negro{fill:#16122e}.casilla-rueda.verde{fill:#14804a}
+.numero-rueda{fill:#fff;font:700 8px var(--sans);text-anchor:middle}
+.centro-rueda{fill:#7a4a1c;stroke:#e9d48a;stroke-width:2}
+.eje-rueda{fill:#e9d48a}
+.flecha-rueda{position:absolute;top:-6px;left:50%;width:0;height:0;transform:translateX(-50%);border:10px solid transparent;border-top:16px solid var(--chispa);filter:drop-shadow(0 2px 0 #1d1745)}
+.resultado-rueda{position:absolute;inset:0;margin:auto;width:3.4rem;height:3.4rem;display:grid;place-items:center;border-radius:50%;background:#fffdf8;color:#1d1745;border:3px solid #1d1745;font:400 2rem/1 var(--pixel)}
+.resultado-rueda.rojo{background:#c0162f;color:#fff}.resultado-rueda.negro{background:#16122e;color:#fff}.resultado-rueda.verde{background:#14804a;color:#fff}
+.historial-ruleta{display:flex;flex-wrap:wrap;justify-content:center;gap:.3rem;min-height:1.9rem}
+.bolita{display:grid;place-items:center;width:1.8rem;height:1.8rem;border-radius:50%;font-weight:800;font-size:.8rem;color:#fff;border:2px solid #f2fff6}
+.bolita.rojo{background:#c0162f}.bolita.negro{background:#16122e}.bolita.verde{background:#14804a}
+.bolita.ultima{outline:3px solid var(--chispa);outline-offset:1px}
+.ayuda-ficha{font-weight:800;font-size:.9rem;color:var(--suave);margin-bottom:-.5rem}
+.fichas-ruleta button{min-width:3.6rem;border-style:dashed}
+.pano{width:100%;display:grid;gap:.35rem;padding:.6rem;border-radius:var(--radio);background:#14663b;border:3px solid #0b3d24}
+.numeros-pano{display:grid;gap:3px;grid-template-columns:repeat(3,1fr);grid-auto-rows:2.6rem}
+.numeros-pano .cero{grid-column:1 / -1;grid-row:1}
+.numeros-pano .casilla-pano:not(.cero){grid-column:var(--vc);grid-row:var(--vf)}
+@media (min-width:700px){
+  .numeros-pano{grid-template-columns:2.6rem repeat(12,1fr);grid-template-rows:repeat(3,2.7rem);grid-auto-rows:auto}
+  .numeros-pano .cero{grid-column:1;grid-row:1 / 4}
+  .numeros-pano .casilla-pano:not(.cero){grid-column:var(--hc);grid-row:var(--hf)}
+}
+.afuera-pano{display:grid;gap:3px}
+.docenas{grid-template-columns:repeat(3,1fr)}
+.simples{grid-template-columns:repeat(3,1fr)}
+@media (min-width:700px){.simples{grid-template-columns:repeat(6,1fr)}}
+.casilla-pano{position:relative;min-height:2.6rem;min-width:0;padding:0 .2rem;border-radius:6px;border:2px solid #e9d48a;background:transparent;color:#fff;font:400 1.35rem/1 var(--pixel);cursor:pointer;touch-action:manipulation}
+.casilla-pano.rojo{background:#c0162f}.casilla-pano.negro{background:#16122e}.casilla-pano.verde{background:#14804a}
+.casilla-pano.afuera{font:800 .9rem/1.1 var(--sans)}
+.casilla-pano.afuera.rojo span{color:#ff8a9a}.casilla-pano.afuera.negro span{color:#fff}
+.casilla-pano.afuera.rojo,.casilla-pano.afuera.negro{background:transparent}
+.casilla-pano.afuera.rojo::before,.casilla-pano.afuera.negro::before{content:"";display:inline-block;width:.8rem;height:.8rem;margin-right:.3rem;border-radius:3px;vertical-align:-1px;border:1.5px solid #fff}
+.casilla-pano.afuera.rojo::before{background:#c0162f}.casilla-pano.afuera.negro::before{background:#16122e}
+.casilla-pano:not(:disabled):hover{outline:2px solid var(--chispa);outline-offset:-4px}
+.casilla-pano:disabled{cursor:default}
+.monto-pano{position:absolute;top:-6px;right:-4px;z-index:1;min-width:1.6rem;padding:.12rem .3rem;border-radius:999px;background:var(--chispa);color:#1d1745;border:2px solid #1d1745;font:800 .7rem/1 var(--sans);font-style:normal;pointer-events:none}
+.monto-pano:empty{display:none}
+@media (prefers-reduced-motion:reduce){.disco{transition:none!important}}

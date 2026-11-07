@@ -23,8 +23,9 @@ async function pagina(opciones) {
 const p = await pagina({ viewport: { width: 1366, height: 860 }, colorScheme: "dark" });
 await p.goto(BASE + "/");
 await p.waitForSelector(".tarjeta-juego");
-ok(await p.locator(".tarjeta-juego").count() === 5, "la sala muestra los 5 juegos");
-ok(await p.locator("#posiciones-sala .pildoras button").count() === 5, "tabla de posiciones con 5 tablas");
+ok(await p.locator(".tarjeta-juego").count() === 6, "la sala muestra los 6 juegos");
+ok(/TukiPoints/.test(await p.textContent("#saldo-sala")), "la sala muestra el saldo de TukiPoints");
+ok(await p.locator("#posiciones-sala .pildoras button").count() === 6, "tabla de posiciones con 6 tablas");
 await p.waitForSelector("#posiciones-sala .caja-tabla :is(ol, .tabla-vacia)");
 await p.screenshot({ path: CAPS + "/sala.png", fullPage: true });
 
@@ -72,7 +73,30 @@ const enJuego = await p.locator("text=Plantarse").count();
 if (enJuego) await p.click("text=Plantarse");
 await p.waitForFunction(() => /Ganas|Pierdes|Empate|Blackjack|pasó|pasaste/i.test(document.querySelector(".estado-juego").textContent), null, { timeout: 3000 });
 ok(await p.locator(".mano").first().locator(".carta").count() >= 2, "blackjack: reparte y resuelve la mano", await p.textContent(".estado-juego"));
+ok((await p.textContent(".marcador")).includes("TukiPoints"), "blackjack: se juega con TukiPoints");
 await p.screenshot({ path: CAPS + "/blackjack.png" });
+
+// Ruleta: comparte el saldo con el blackjack, apuesta, gira y paga
+const saldoAntes = await p.evaluate(() => Juegos.api.tukipoints.saldo());
+await p.click('#nav-juegos a[href="#ruleta"]');
+await p.waitForSelector(".rueda");
+ok((await p.textContent(".marcador b")).replace(/\./g, "") === String(saldoAntes), "ruleta: usa el mismo saldo de TukiPoints que el blackjack", String(saldoAntes));
+ok(await p.locator(".numeros-pano .casilla-pano").count() === 37, "ruleta: paño con 37 números");
+await p.click('[data-ficha="50"]');
+await p.click('[data-apuesta="rojo"]');
+await p.click('[data-apuesta="n17"]');
+ok((await p.textContent('[data-apuesta="rojo"] .monto-pano')) === "50", "ruleta: la ficha queda en la casilla");
+await p.screenshot({ path: CAPS + "/ruleta-apuesta.png" });
+await p.click("text=Girar");
+await p.waitForFunction(() => /Salió el \d+/.test(document.querySelector(".estado-juego").textContent), null, { timeout: 8000 });
+const tirada = await p.evaluate(() => {
+  const n = +document.querySelector(".resultado-rueda").textContent;
+  return { n, saldo: Juegos.api.tukipoints.saldo(), texto: document.querySelector(".estado-juego").textContent };
+});
+const ROJOS = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
+const esperado = saldoAntes - 100 + (ROJOS.includes(tirada.n) ? 100 : 0) + (tirada.n === 17 ? 1800 : 0);
+ok(tirada.saldo === esperado, "ruleta: paga bien la tirada", tirada.texto);
+await p.screenshot({ path: CAPS + "/ruleta.png" });
 
 // 2048
 await p.click('#nav-juegos a[href="#2048"]');
@@ -104,7 +128,7 @@ await p.screenshot({ path: CAPS + "/sala-dia.png", fullPage: true });
 
 // ---------- Celular ----------
 const m = await pagina({ viewport: { width: 375, height: 760 }, isMobile: true, hasTouch: true, colorScheme: "dark" });
-for (const id of ["", "#snake", "#gato", "#blackjack", "#2048", "#buscaminas"]) {
+for (const id of ["", "#snake", "#gato", "#blackjack", "#ruleta", "#2048", "#buscaminas"]) {
   await m.goto(BASE + "/" + id);
   await m.waitForSelector(id ? "#juego:not([hidden])" : "#sala:not([hidden])");
   await m.waitForTimeout(250);
@@ -116,6 +140,10 @@ for (const id of ["", "#snake", "#gato", "#blackjack", "#2048", "#buscaminas"]) 
   }
   await m.screenshot({ path: CAPS + "/movil-" + (id.slice(1) || "sala") + ".png", fullPage: true });
 }
+
+// Filtro de nombres groseros en la API
+const grosero = await m.evaluate(() => fetch("/api/puntajes", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ juego: "2048", nombre: "w e o n", puntos: 100 }) }).then(async (r) => ({ estado: r.status, d: await r.json() })));
+ok(grosero.estado === 400 && /no está permitido/.test(grosero.d.error), "API: rechaza nombres groseros", JSON.stringify(grosero));
 
 ok(!errores.length, "sin errores de JS", errores.join(" | "));
 await nav.close();

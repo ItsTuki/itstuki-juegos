@@ -4,16 +4,19 @@
 //     GET  /api/posiciones?juego=snake   → { juego, filas: [{ nombre, puntos, fecha }] }  (top 10, mejor marca por nombre)
 //     POST /api/puntajes { juego, nombre, puntos } → { ok, posicion, nombre }
 // - Contador de visitas en /api/visitas (worker/visitas.js), compartido con itstuki.cl.
+// - Los nombres groseros se rechazan al anotar y se ocultan de la tabla (worker/filtro.js).
 // - Si no hay base de datos configurada, la API responde 503 y la sala sigue funcionando con récords locales.
 // - Toda dirección que no exista redirige a PAGINA_404 (o a la portada si no está definida).
 
 import { visitas } from "./visitas.js";
+import { nombreOfensivo } from "./filtro.js";
 
 // Límites por tabla: evitan puntajes imposibles. "menor" = menos es mejor (tiempos).
 const TABLAS = {
   snake: { min: 10, max: 4000, menor: false },
   "2048": { min: 4, max: 4000000, menor: false },
   blackjack: { min: 1001, max: 100000000, menor: false },
+  ruleta: { min: 10, max: 100000000, menor: false }, // mayor premio en una sola tirada
   "buscaminas-facil": { min: 1, max: 9999, menor: true },
   "buscaminas-medio": { min: 3, max: 9999, menor: true },
 };
@@ -69,11 +72,15 @@ async function top(db, juego) {
   const { results } = await db
     .prepare(
       `SELECT nombre, ${agregado} AS puntos, MIN(creado) AS fecha FROM puntajes
-       WHERE juego = ?1 GROUP BY nombre COLLATE NOCASE ORDER BY puntos ${orden}, fecha ASC LIMIT 10`
+       WHERE juego = ?1 GROUP BY nombre COLLATE NOCASE ORDER BY puntos ${orden}, fecha ASC LIMIT 50`
     )
     .bind(juego)
     .all();
-  return results.map((f) => ({ nombre: f.nombre, puntos: f.puntos, fecha: new Date(f.fecha).toISOString().slice(0, 10) }));
+  // Los nombres groseros que ya estaban guardados no se muestran
+  return results
+    .filter((f) => !nombreOfensivo(f.nombre))
+    .slice(0, 10)
+    .map((f) => ({ nombre: f.nombre, puntos: f.puntos, fecha: new Date(f.fecha).toISOString().slice(0, 10) }));
 }
 
 async function api(request, url, env) {
@@ -94,6 +101,7 @@ async function api(request, url, env) {
     if (!def) return json({ error: "Juego desconocido." }, 400);
     const nombre = limpiarNombre(cuerpo.nombre);
     if (!nombre) return json({ error: "El nombre debe tener entre 2 y 16 letras o números." }, 400);
+    if (nombreOfensivo(nombre)) return json({ error: "Ese nombre no está permitido. Elige otro." }, 400);
     const puntos = Number(cuerpo.puntos);
     if (!Number.isInteger(puntos) || puntos < def.min || puntos > def.max) return json({ error: "Ese puntaje no es válido." }, 400);
 
