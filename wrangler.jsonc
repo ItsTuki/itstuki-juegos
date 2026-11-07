@@ -24,7 +24,9 @@
   ],
 
   "vars": {
-    "PAGINA_404": "https://itstuki.cl/404"
+    "PAGINA_404": "https://itstuki.cl/404",
+    // Dominio de la cookie del contador de visitantes (compartida entre subdominios). Bórralo si no aplica.
+    "DOMINIO_COOKIE": "itstuki.cl"
   },
 
   "observability": { "enabled": true }
