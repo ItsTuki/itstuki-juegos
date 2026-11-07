@@ -1,0 +1,31 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "itstuki-juegos",
+  "main": "worker/index.js",
+  "compatibility_date": "2026-11-01",
+
+  "assets": {
+    "directory": "./public/",
+    "binding": "ASSETS",
+    // La API siempre pasa por el Worker; si un archivo no existe, también (y redirige a PAGINA_404).
+    "run_worker_first": ["/api/*"]
+  },
+
+  // Cambia esto por tu dominio (o bórralo y usa la dirección *.workers.dev).
+  "routes": [
+    { "pattern": "juegos.itstuki.cl/*", "zone_name": "itstuki.cl" }
+  ],
+
+  // Tabla de posiciones. Si reutilizas este proyecto, crea tu propia base con
+  //   npx wrangler d1 create itstuki-juegos
+  // y reemplaza el database_id. Las tablas se crean solas al primer uso.
+  "d1_databases": [
+    { "binding": "DB", "database_name": "itstuki-juegos", "database_id": "b9792642-d3f6-4748-b749-da508ad542fc" }
+  ],
+
+  "vars": {
+    "PAGINA_404": "https://itstuki.cl/404"
+  },
+
+  "observability": { "enabled": true }
+}
