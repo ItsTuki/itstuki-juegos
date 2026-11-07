@@ -226,17 +226,36 @@ var Juegos = (function(){
     window.scrollTo(0, 0);
   }
 
-  /* Contador de visitas compartido con itstuki.cl (una por persona y día) */
+  /* Visitantes totales, compartido con itstuki.cl y actualizado en vivo */
   function contarVisita(){
-    fetch("/api/visitas", { method: "POST", cache: "no-store" })
-      .then(function(r){ if (!r.ok) throw new Error(r.status); return r.json(); })
-      .then(function(d){
-        var mini = $("#contador-mini"); mini.textContent = "";
-        String(d.total).padStart(6, "0").split("").forEach(function(c){ mini.appendChild(el("span", { texto: c })); });
-        $("#visitas-texto").textContent = miles(d.total) + (d.total === 1 ? " visita" : " visitas") + " · hoy " + miles(d.hoy);
-        $("#pie-visitas").hidden = false;
-      })
-      .catch(function(){});
+    var actual = null;
+    function pintar(total){
+      if (total === actual) return;
+      var mini = $("#contador-mini"), texto = String(total).padStart(6, "0"), previo = actual === null ? null : String(actual).padStart(6, "0");
+      if (!previo || previo.length !== texto.length){
+        mini.textContent = "";
+        texto.split("").forEach(function(c){ mini.appendChild(el("span", null, [ el("b", { texto: c }) ])); });
+      } else {
+        texto.split("").forEach(function(c, i){
+          if (previo[i] === c) return;
+          var celda = mini.children[i], viejo = celda.querySelector("b:not(.sale)");
+          if (viejo){ viejo.className = "sale"; setTimeout(function(){ viejo.remove(); }, 450); }
+          celda.appendChild(el("b", { texto: c, clase: "entra" }));
+        });
+      }
+      actual = total;
+      $("#visitas-texto").textContent = miles(total) + (total === 1 ? " visitante" : " visitantes") + " en total";
+      $("#pie-visitas").hidden = false;
+    }
+    function pedir(metodo){
+      return fetch("/api/visitas", { method: metodo, cache: "no-store", credentials: "same-origin" })
+        .then(function(r){ if (!r.ok) throw new Error(r.status); return r.json(); })
+        .then(function(d){ pintar(d.total); });
+    }
+    pedir("POST").then(function(){
+      setInterval(function(){ if (document.visibilityState === "visible") pedir("GET").catch(function(){}); }, 8000);
+      document.addEventListener("visibilitychange", function(){ if (document.visibilityState === "visible") pedir("GET").catch(function(){}); });
+    }).catch(function(){});
   }
 
   function iniciar(){

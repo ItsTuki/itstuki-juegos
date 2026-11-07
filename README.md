@@ -99,14 +99,15 @@ Para que acepte puntajes, agrega su clave con el mínimo y el máximo en `TABLAS
 npx wrangler d1 execute itstuki-juegos --remote --command "DELETE FROM puntajes WHERE nombre = 'Tramposo'"
 ```
 
-## Contador de visitas
+## Contador de visitantes
 
-El pie de la sala muestra un contador de visitas (`/api/visitas`, en `worker/visitas.js`):
+El pie de la sala muestra cuántas personas han visitado el sitio en total (`/api/visitas`, en `worker/visitas.js`).
 
-- **Qué cuenta:** una visita por persona y día. Si alguien recarga la página o pasa de un sitio a otro el mismo día, cuenta una sola vez.
-- **Qué guarda:** solo una huella cifrada de la IP y el navegador. Nunca guarda la IP.
+- **Una vez para siempre:** cada persona cuenta una sola vez.
+- **Cómo la reconoce:** con una cookie válida para todo el dominio (`DOMINIO_COOKIE`). Si no trae cookie, usa una huella cifrada de la IP y el navegador; nunca guarda la IP.
 - **Robots:** no se cuentan.
-- **Compartirlo:** el contador vive en la misma base D1, así que si otro sitio tuyo usa esa base con el mismo `worker/visitas.js`, ambos comparten la cuenta. Así funciona entre itstuki.cl y juegos.itstuki.cl.
+- **En vivo:** la página consulta el total cada 8 segundos mientras está a la vista, y los dígitos giran cuando llega alguien nuevo.
+- **Compartido:** si otro sitio tuyo usa la misma base D1 con el mismo `worker/visitas.js` y el mismo `DOMINIO_COOKIE`, ambos comparten la cuenta. Así funciona entre itstuki.cl y juegos.itstuki.cl.
 
 ## Licencia
 

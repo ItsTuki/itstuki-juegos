@@ -141,7 +141,12 @@
 .pie-juegos{margin-top:2rem;text-align:center;font:1.2rem/1.6 var(--pixel);color:var(--suave)}
 .pie-juegos a{color:var(--acento)}
 
-/* Contador de visitas en el pie */
+/* Visitantes totales en el pie (dígitos que giran al cambiar) */
 .pie-visitas{display:inline-flex;align-items:center;gap:.4rem;flex-wrap:wrap;justify-content:center}
 .contador-mini{display:inline-flex;gap:2px}
-.contador-mini span{display:inline-grid;place-items:center;width:18px;height:26px;border-radius:4px;background:#0a081d;border:1.5px solid var(--borde);color:var(--chispa);font:400 1.3rem/1 var(--pixel)}
+.contador-mini span{position:relative;overflow:hidden;display:inline-block;width:18px;height:26px;border-radius:4px;background:#0a081d;border:1.5px solid var(--borde)}
+.contador-mini b{position:absolute;inset:0;display:grid;place-items:center;color:var(--chispa);font:400 1.3rem/1 var(--pixel)}
+.contador-mini b.entra{animation:digito-entra .45s cubic-bezier(.2,.8,.3,1)}
+.contador-mini b.sale{animation:digito-sale .45s cubic-bezier(.2,.8,.3,1) forwards}
+@keyframes digito-entra{from{transform:translateY(100%)}}
+@keyframes digito-sale{to{transform:translateY(-100%)}}
