@@ -1,0 +1,13 @@
+{
+  "name": "itstuki-juegos",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "probar": "node test/e2e-juegos.mjs"
+  },
+  "devDependencies": {
+    "wrangler": "^4"
+  }
+}
