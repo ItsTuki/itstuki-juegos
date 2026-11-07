@@ -3,8 +3,11 @@
 // - API de la tabla de posiciones en D1 (binding DB):
 //     GET  /api/posiciones?juego=snake   → { juego, filas: [{ nombre, puntos, fecha }] }  (top 10, mejor marca por nombre)
 //     POST /api/puntajes { juego, nombre, puntos } → { ok, posicion, nombre }
+// - Contador de visitas en /api/visitas (worker/visitas.js), compartido con itstuki.cl.
 // - Si no hay base de datos configurada, la API responde 503 y la sala sigue funcionando con récords locales.
 // - Toda dirección que no exista redirige a PAGINA_404 (o a la portada si no está definida).
+
+import { visitas } from "./visitas.js";
 
 // Límites por tabla: evitan puntajes imposibles. "menor" = menos es mejor (tiempos).
 const TABLAS = {
@@ -118,6 +121,7 @@ async function api(request, url, env) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    if (url.pathname === "/api/visitas") return visitas(request, env, url.hostname);
     if (url.pathname.startsWith("/api/")) {
       try {
         return await api(request, url, env);
