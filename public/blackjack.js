@@ -109,7 +109,7 @@ Juegos.registrar({
       fase = "fin";
       estadoEl.textContent = texto + (fichas < 10 ? " Te quedaste sin TukiPoints." : "");
       pintar();
-      if (r.nuevo && fichas > INICIAL) { api.aviso("¡Nuevo máximo: " + TP.texto(fichas) + "!"); api.ofrecerGuardar("blackjack", fichas); }
+      if (r.mejora && fichas > INICIAL) { if (r.nuevo) api.aviso("¡Nuevo máximo: " + TP.texto(fichas) + "!"); api.ofrecerGuardar("blackjack", fichas); }
     }
     function tecla(e){
       if (e.target.tagName === "INPUT") return;

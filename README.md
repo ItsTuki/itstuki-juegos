@@ -9,7 +9,7 @@ Juegos clásicos para el navegador, con tabla de posiciones global, hechos con H
 | **Snake** | Flechas/WASD o deslizar; espacio para pausar | puntos (10 por estrella) |
 | **3 en raya** | Contra la compu (fácil o imposible, con minimax) o de a dos | marcador local |
 | **Blackjack** | Apuesta, pide, plántate o dobla. Con TukiPoints, sin dinero real | máximo de TukiPoints |
-| **Ruleta** | Ruleta europea: plenos, colores, par/impar, mitades y docenas. Con TukiPoints | mayor premio en una tirada |
+| **Ruleta** | Ruleta europea: plenos, colores, par/impar, mitades y docenas. Con TukiPoints | máximo de TukiPoints |
 | **2048** | Flechas/WASD o deslizar; con deshacer | puntos |
 | **Buscaminas** | Clic para descubrir, clic derecho o mantener presionado para bandera | mejor tiempo (fácil y medio) |
 

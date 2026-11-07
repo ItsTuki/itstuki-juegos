@@ -106,6 +106,19 @@ await p.click("text=Girar");
 await p.waitForFunction(() => /Salió el 15/.test(document.querySelector(".estado-juego").textContent), null, { timeout: 10000 });
 ok(await p.evaluate(() => Juegos.api.tukipoints.saldo()) === antesNegro + 10, "ruleta: apostar al negro paga cuando sale negro");
 ok(await p.isVisible(".bola-rueda") && await p.isVisible(".resalte-rueda"), "ruleta: la bola queda en la casilla ganadora y se ilumina");
+// Al superar su máximo de TukiPoints, ofrece anotarlo y la tabla lo muestra
+await p.evaluate(() => { localStorage.setItem("juegos:tukipoints", "3990"); localStorage.removeItem("juegos:record:ruleta"); crypto.getRandomValues = (a) => { a[0] = 1; return a; }; }); // ORDEN[1] = 32, rojo
+await p.click('#nav-juegos a[href="#snake"]'); await p.click('#nav-juegos a[href="#ruleta"]'); await p.waitForSelector(".rueda");
+await p.evaluate(() => { crypto.getRandomValues = (a) => { a[0] = 1; return a; }; });
+await p.click('[data-apuesta="rojo"]'); await p.click("text=Girar");
+await p.waitForSelector(".guardar-puntaje", { timeout: 10000 });
+ok((await p.textContent(".guardar-puntaje b")).replace(/\./g, "").startsWith("4000"), "ruleta: al llegar a 4.000 ofrece anotar el máximo");
+await p.waitForTimeout(15500);
+const NOMBRE_R = "Ruleta " + Date.now().toString(36).slice(-4);
+await p.fill("#nombre-puntaje", NOMBRE_R); await p.click('.guardar-puntaje [type="submit"]');
+await p.waitForSelector(".panel-posiciones li.yo", { timeout: 8000 }).catch(() => {});
+ok((await p.textContent(".panel-posiciones li.yo").catch(() => "")).includes("4.000"), "ruleta: la tabla muestra los 4.000 TukiPoints");
+await p.screenshot({ path: CAPS + "/ruleta-tabla.png" });
 
 // 2048
 await p.click('#nav-juegos a[href="#2048"]');

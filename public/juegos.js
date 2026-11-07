@@ -41,7 +41,8 @@ var Juegos = (function(){
     var previo = leer("record:" + clave, null);
     var mejora = previo === null || (menorEsMejor ? puntos < previo : puntos > previo);
     if (mejora) guardar("record:" + clave, puntos);
-    return { record: mejora ? puntos : previo, nuevo: mejora && previo !== null };
+    // mejora: superó su marca (o es la primera); nuevo: superó una marca que ya existía
+    return { record: mejora ? puntos : previo, nuevo: mejora && previo !== null, mejora: mejora };
   }
 
   /* ---------- TukiPoints: la moneda de la sala (sin dinero real) ----------

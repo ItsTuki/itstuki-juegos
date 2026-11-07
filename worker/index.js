@@ -16,7 +16,7 @@ const TABLAS = {
   snake: { min: 10, max: 4000, menor: false },
   "2048": { min: 4, max: 4000000, menor: false },
   blackjack: { min: 1001, max: 100000000, menor: false },
-  ruleta: { min: 10, max: 100000000, menor: false }, // mayor premio en una sola tirada
+  ruleta: { min: 1001, max: 100000000, menor: false }, // máximo de TukiPoints alcanzado
   "buscaminas-facil": { min: 1, max: 9999, menor: true },
   "buscaminas-medio": { min: 3, max: 9999, menor: true },
 };
@@ -72,9 +72,9 @@ async function top(db, juego) {
   const { results } = await db
     .prepare(
       `SELECT nombre, ${agregado} AS puntos, MIN(creado) AS fecha FROM puntajes
-       WHERE juego = ?1 GROUP BY nombre COLLATE NOCASE ORDER BY puntos ${orden}, fecha ASC LIMIT 50`
+       WHERE juego = ?1 AND puntos BETWEEN ?2 AND ?3 GROUP BY nombre COLLATE NOCASE ORDER BY puntos ${orden}, fecha ASC LIMIT 50`
     )
-    .bind(juego)
+    .bind(juego, def.min, def.max)
     .all();
   // Los nombres groseros que ya estaban guardados no se muestran
   return results

@@ -1,14 +1,14 @@
 /* Ruleta europea (un solo cero) con TukiPoints, la moneda de la sala (sin dinero real).
    Apuestas: número pleno (paga 35 a 1), rojo/negro, par/impar, 1-18/19-36 (1 a 1) y docenas (2 a 1).
    Con el 0 pierden todas las apuestas de afuera. El saldo es el mismo del Blackjack (api.tukipoints).
-   La tabla de posiciones guarda el mayor premio que ganaste en una sola tirada. */
+   La tabla de posiciones guarda el máximo de TukiPoints que alcanzaste jugando a la ruleta. */
 Juegos.registrar({
   id: "ruleta",
   nombre: "Ruleta",
   descripcion: "Apuesta a un número, a un color o a una docena y gira. Se juega con TukiPoints.",
   icono: "◎",
   tablas: [{ clave: "ruleta", nombre: "Ruleta", menorEsMejor: false, formato: function(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ".") + " TukiPoints"; } }],
-  resumen: function(api){ var r = api.leer("record:ruleta", null); return r === null ? "Saldo: " + api.tukipoints.texto(api.tukipoints.saldo()) : "Mayor premio: " + api.tukipoints.texto(r); },
+  resumen: function(api){ var r = api.leer("record:ruleta", null); return r === null || r <= api.tukipoints.inicial ? "Saldo: " + api.tukipoints.texto(api.tukipoints.saldo()) : "Máximo: " + api.tukipoints.texto(r); },
   montar: function(cont, api){
     "use strict";
     var el = api.el, TP = api.tukipoints, INICIAL = TP.inicial;
@@ -129,6 +129,7 @@ Juegos.registrar({
       controles.appendChild(el("button", { type: "button", clase: "boton", texto: girando ? "Girando…" : "Girar", disabled: girando || total < 10, onclick: girar }));
       controles.appendChild(el("button", { type: "button", clase: "boton secundario chico", texto: "Limpiar", disabled: girando || !total, onclick: function(){ apuestas = {}; pintar(); } }));
       if (ultimas && !total) controles.appendChild(el("button", { type: "button", clase: "boton secundario chico", texto: "Repetir apuesta", disabled: girando, onclick: repetir }));
+      if (!girando && saldo > INICIAL) controles.appendChild(el("button", { type: "button", clase: "boton secundario chico", texto: "Anotar mis TukiPoints", onclick: function(){ api.ofrecerGuardar("ruleta", saldo); } }));
       if (!girando && saldo < 10) controles.appendChild(el("button", { type: "button", clase: "boton", texto: "Recargar " + TP.texto(INICIAL), onclick: function(){ saldo = INICIAL; TP.guardar(saldo); estadoEl.textContent = "TukiPoints recargados. ¡Suerte!"; pintar(); } }));
       historialEl.textContent = "";
       historial.forEach(function(x, i){ historialEl.appendChild(el("span", { clase: "bolita " + color(x) + (i === 0 ? " ultima" : ""), texto: String(x) })); });
@@ -213,7 +214,7 @@ Juegos.registrar({
       saldo += premio;
       TP.guardar(saldo);
       historial.unshift(sale); historial = historial.slice(0, 12); api.guardar("ruleta:historial", historial);
-      if (silencioso){ if (neto >= 10) api.record("ruleta", neto, false); return; }
+      if (silencioso){ api.record("ruleta", saldo, false); return; }
       bola.textContent = String(sale); bola.className = "resultado-rueda aparece " + color(sale);
       var nombreColor = { rojo: "rojo", negro: "negro", verde: "verde" }[color(sale)];
       var texto = "Salió el " + sale + " " + nombreColor + ". ";
@@ -224,12 +225,11 @@ Juegos.registrar({
       estadoEl.textContent = texto;
       apuestas = {}; girando = false;
       pintar();
-      if (neto >= 10){
-        var r = api.record("ruleta", neto, false);
-        if (r.record === neto){
-          if (r.nuevo) api.aviso("¡Nuevo mayor premio: " + TP.texto(neto) + "!");
-          api.ofrecerGuardar("ruleta", neto);
-        }
+      // Nuevo máximo de TukiPoints: se ofrece anotarlo en la tabla (también la primera vez)
+      var r = api.record("ruleta", saldo, false);
+      if (r.mejora && saldo > INICIAL){
+        if (r.nuevo) api.aviso("¡Nuevo máximo: " + TP.texto(saldo) + "!");
+        api.ofrecerGuardar("ruleta", saldo);
       }
     }
 
