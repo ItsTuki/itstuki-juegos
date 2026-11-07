@@ -140,3 +140,8 @@
 
 .pie-juegos{margin-top:2rem;text-align:center;font:1.2rem/1.6 var(--pixel);color:var(--suave)}
 .pie-juegos a{color:var(--acento)}
+
+/* Contador de visitas en el pie */
+.pie-visitas{display:inline-flex;align-items:center;gap:.4rem;flex-wrap:wrap;justify-content:center}
+.contador-mini{display:inline-flex;gap:2px}
+.contador-mini span{display:inline-grid;place-items:center;width:18px;height:26px;border-radius:4px;background:#0a081d;border:1.5px solid var(--borde);color:var(--chispa);font:400 1.3rem/1 var(--pixel)}

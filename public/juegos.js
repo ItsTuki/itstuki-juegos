@@ -226,6 +226,19 @@ var Juegos = (function(){
     window.scrollTo(0, 0);
   }
 
+  /* Contador de visitas compartido con itstuki.cl (una por persona y día) */
+  function contarVisita(){
+    fetch("/api/visitas", { method: "POST", cache: "no-store" })
+      .then(function(r){ if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function(d){
+        var mini = $("#contador-mini"); mini.textContent = "";
+        String(d.total).padStart(6, "0").split("").forEach(function(c){ mini.appendChild(el("span", { texto: c })); });
+        $("#visitas-texto").textContent = miles(d.total) + (d.total === 1 ? " visita" : " visitas") + " · hoy " + miles(d.hoy);
+        $("#pie-visitas").hidden = false;
+      })
+      .catch(function(){});
+  }
+
   function iniciar(){
     var b = $("#cambiar-tema");
     function etiqueta(){ b.setAttribute("aria-label", document.documentElement.dataset.tema === "noche" ? "Cambiar a modo día" : "Cambiar a modo noche"); }
@@ -240,6 +253,7 @@ var Juegos = (function(){
     window.addEventListener("hashchange", abrir);
     pintarNav();
     abrir();
+    contarVisita();
   }
 
   return { registrar: registrar, iniciar: iniciar, api: api };
