@@ -28,6 +28,13 @@ ok(/TukiPoints/.test(await p.textContent("#saldo-sala")), "la sala muestra el sa
 ok(await p.locator("#posiciones-sala .pildoras button").count() === 6, "tabla de posiciones con 6 tablas");
 await p.waitForSelector("#posiciones-sala .caja-tabla :is(ol, .tabla-vacia)");
 await p.screenshot({ path: CAPS + "/sala.png", fullPage: true });
+// Sonido: botones de música y efectos
+ok(await p.locator(".barra-juegos .boton-sonido").count() === 2, "sonido: botones de música y efectos en la barra");
+await p.click('.boton-sonido[data-sonido="musica"]');
+await p.waitForTimeout(300);
+ok(await p.evaluate(() => Sonido.estado().sonando) && (await p.getAttribute('.boton-sonido[data-sonido="musica"]', "aria-pressed")) === "true", "sonido: la música se enciende con el botón");
+await p.click('.boton-sonido[data-sonido="musica"]');
+ok(!(await p.evaluate(() => Sonido.estado().sonando)), "sonido: y se apaga");
 
 // Snake
 await p.click('a.tarjeta-juego[href="#snake"]');

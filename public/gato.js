@@ -76,6 +76,7 @@ Juegos.registrar({
     }
     function cerrar(g){
       fin = true;
+      api.sonido.efecto(g.quien === "empate" ? "empate" : (g.quien === "X" || modo === "dos") ? "ganar" : "perder");
       if (g.quien === "empate"){ marcador.e++; estadoEl.textContent = "Empate. ¡Bien defendido!"; }
       else if (g.quien === "X"){ marcador.x++; estadoEl.textContent = modo === "dos" ? "¡Gana X!" : "¡Ganaste!"; }
       else { marcador.o++; estadoEl.textContent = modo === "dos" ? "¡Gana O!" : "Ganó la compu. Otra vez será."; }
@@ -85,6 +86,7 @@ Juegos.registrar({
       if (fin || tablero[i]) return;
       if (modo !== "dos" && turno !== "X") return;
       tablero[i] = turno;
+      api.sonido.efecto("pop");
       var g = ganador(tablero);
       if (g) return cerrar(g);
       turno = turno === "X" ? "O" : "X";
@@ -93,6 +95,7 @@ Juegos.registrar({
         setTimeout(function(){
           if (fin) return;
           tablero[jugadaCompu()] = "O"; turno = "X";
+          api.sonido.efecto("abrir");
           var g2 = ganador(tablero);
           if (g2) return cerrar(g2);
           estadoEl.textContent = "Tu turno: juegas con ✕."; pintar();

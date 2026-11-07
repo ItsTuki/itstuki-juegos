@@ -15,6 +15,8 @@ Juegos clásicos para el navegador, con tabla de posiciones global, hechos con H
 
 **TukiPoints** es la moneda de la sala: un solo saldo para Blackjack y Ruleta, guardado en el navegador (`api.tukipoints`). Se empieza con 1.000 y se puede recargar al quedar en cero. No hay dinero real.
 
+**Sonido:** música chiptune original y efectos para cada juego, generados en el navegador con Web Audio (`public/sonido.js`, sin archivos de audio). La música empieza apagada; los botones 🎵 y 🔊 de la barra la encienden y silencian los efectos, y el navegador recuerda la elección. Los juegos usan `api.sonido.efecto("nombre")`.
+
 Todo funciona en el celular (controles táctiles y botones en pantalla), tiene tema día/noche y guarda los récords en el navegador. Si la tabla de posiciones no está disponible, los juegos siguen funcionando.
 
 ## Úsalo para tu sitio
@@ -60,6 +62,7 @@ public/            la sala y los juegos (archivos estáticos)
   index.html       sala, juego activo y panel de posiciones
   juegos.js        núcleo: navegación, récords, controles táctiles, tabla de posiciones
   snake.js · gato.js · blackjack.js · ruleta.js · 2048.js · buscaminas.js
+  sonido.js        música y efectos (Web Audio)
   juegos.css · base.css · tema.js
 worker/index.js    API de posiciones (D1) y archivos estáticos
 worker/filtro.js   filtro de nombres groseros

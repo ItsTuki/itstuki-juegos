@@ -137,8 +137,9 @@ Juegos.registrar({
 
     function apostar(clave){
       if (girando) return;
-      if (libre() < ficha){ api.aviso(libre() < 10 ? "No te quedan TukiPoints libres." : "No alcanza para esa ficha. Elige una más chica."); return; }
+      if (libre() < ficha){ api.sonido.efecto("error"); api.aviso(libre() < 10 ? "No te quedan TukiPoints libres." : "No alcanza para esa ficha. Elige una más chica."); return; }
       apuestas[clave] = (apuestas[clave] || 0) + ficha;
+      api.sonido.efecto("ficha");
       pintar();
     }
     function repetir(){
@@ -167,7 +168,7 @@ Juegos.registrar({
       var R = ((bola0 - casilla0) % 360 + 360) % 360 + VUELTAS_BOLA * 360;
       bolaRueda.style.display = ""; bolaVisible = true;
       resalte.style.display = "none";
-      var t0 = null;
+      var t0 = null, casillaBola = null, rebotes = 0;
       function cuadro(ahora){
         if (t0 === null) t0 = ahora;
         var t = Math.min(1, (ahora - t0) / DURA);
@@ -180,8 +181,16 @@ Juegos.registrar({
           ang += 5 * Math.sin(p * Math.PI * 3) * (1 - p);
         }
         ponerRueda(w); ponerBola(ang, radio); bolaAng = ang;
+        // Sonido: la bola golpea los separadores mientras corre y rebota al caer
+        var c = Math.floor((((ang - w) % 360 + 360) % 360 + GRADOS / 2) / GRADOS);
+        if (casillaBola !== null && c !== casillaBola && t < CAE) api.sonido.efecto("tick", 1 - t / CAE);
+        casillaBola = c;
+        if (t > CAE && t < ENTRA){
+          var r3 = Math.floor((t - CAE) / (ENTRA - CAE) * 3);
+          if (r3 > rebotes - 1 && r3 < 3 && rebotes <= r3){ api.sonido.efecto("bola", 1 - r3 / 3); rebotes = r3 + 1; }
+        }
         if (t < 1) anim = requestAnimationFrame(cuadro);
-        else { anim = null; giro = w; resalte.setAttribute("d", casillasRueda[i].getAttribute("d")); resalte.style.display = ""; alTerminar(); }
+        else { anim = null; giro = w; api.sonido.efecto("cae"); resalte.setAttribute("d", casillasRueda[i].getAttribute("d")); resalte.style.display = ""; alTerminar(); }
       }
       anim = requestAnimationFrame(cuadro);
     }
@@ -222,6 +231,7 @@ Juegos.registrar({
       else if (premio > 0) texto += "Recuperas " + TP.texto(premio) + " de " + api.miles(apostado) + ".";
       else texto += "Pierdes " + TP.texto(apostado) + ".";
       if (saldo < 10) texto += " Te quedaste sin TukiPoints.";
+      setTimeout(function(){ api.sonido.efecto(neto >= apostado * 10 && neto > 0 ? "grande" : neto > 0 ? "ganar" : premio > 0 ? "empate" : "perder"); }, 180);
       estadoEl.textContent = texto;
       apuestas = {}; girando = false;
       pintar();

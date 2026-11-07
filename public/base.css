@@ -180,3 +180,10 @@ button,input,textarea{font:inherit;color:inherit}
   .banda{white-space:normal}
   .banda-pista span+span{display:none}
 }
+
+/* Botones de sonido (sonido.js): tachados cuando están apagados */
+.boton-sonido .tachado{display:none}
+.boton-sonido.apagado{opacity:.75}
+.boton-sonido.apagado .tachado{display:inline}
+.boton-sonido.apagado .ondas{display:none}
+.boton-sonido[data-sonido="musica"][aria-pressed="true"]{color:var(--rosa);border-color:var(--rosa)}

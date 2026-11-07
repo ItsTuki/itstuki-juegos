@@ -67,9 +67,10 @@ Juegos.registrar({
       if (!movio) return;
       anterior = { grilla: copia, puntos: puntos };
       puntos += sumaTotal;
+      if (sumaTotal) api.sonido.efecto("unir", Math.max.apply(null, grilla.map(function(f){ return Math.max.apply(null, f); }))); else api.sonido.efecto("mover");
       var p = agregar(); if (p) nuevas[p[0] + "," + p[1]] = "nueva";
       pintar(nuevas);
-      if (!gano && grilla.some(function(f){ return f.indexOf(2048) >= 0; })){ gano = true; mostrarCapa("¡Llegaste a 2048!", "Puedes seguir jugando por más puntos.", "Seguir jugando", function(){ seguir = true; capa.hidden = true; }); }
+      if (!gano && grilla.some(function(f){ return f.indexOf(2048) >= 0; })){ gano = true; api.sonido.efecto("grande"); mostrarCapa("¡Llegaste a 2048!", "Puedes seguir jugando por más puntos.", "Seguir jugando", function(){ seguir = true; capa.hidden = true; }); }
       else if (!hayMovimientos()) terminar();
     }
     function hayMovimientos(){
@@ -83,6 +84,7 @@ Juegos.registrar({
     function terminar(){
       terminado = true; seguir = false;
       var r = api.record("2048", puntos, false); recordEl.textContent = api.miles(r.record);
+      api.sonido.efecto(r.nuevo ? "record" : "perder");
       mostrarCapa("Sin movimientos", api.miles(puntos) + " puntos" + (r.nuevo ? " · ¡nuevo récord!" : ""), "Otra vez", nueva);
       if (puntos > 0) api.ofrecerGuardar("2048", puntos);
     }

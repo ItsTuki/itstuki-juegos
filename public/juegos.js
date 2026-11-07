@@ -172,8 +172,9 @@ var Juegos = (function(){
         panel.ultimo = { clave: p.clave, nombre: r.nombre || nombre, puntos: p.puntos };
         panel.pendiente = null;
         aviso(r.posicion ? "¡Quedaste en el lugar " + r.posicion + "!" : "Puntaje anotado");
+        sonido.efecto("moneda");
         pintarPanel(juego);
-      }).catch(function(err){ aviso(err.message); boton.disabled = false; boton.textContent = "Anotar"; });
+      }).catch(function(err){ aviso(err.message); sonido.efecto("error"); boton.disabled = false; boton.textContent = "Anotar"; });
     });
     setTimeout(function(){ if (window.matchMedia("(min-width: 900px)").matches) input.focus({ preventScroll: true }); }, 50);
     return form;
@@ -188,8 +189,11 @@ var Juegos = (function(){
   }
   function mostrarTabla(clave){ if (juegoActual){ panel.clave = clave; pintarPanel(juegoActual); } }
 
+  /* Sonido (public/sonido.js). Si no cargó, los juegos siguen funcionando en silencio. */
+  var sonido = window.Sonido || { efecto: function(){}, botones: function(){}, cancion: function(){} };
+
   var api = { el: el, aviso: aviso, miles: miles, leer: leer, guardar: guardar, record: record, deslizar: deslizar, cruceta: cruceta, TECLAS: TECLAS,
-    ofrecerGuardar: ofrecerGuardar, mostrarTabla: mostrarTabla, tukipoints: tukipoints };
+    ofrecerGuardar: ofrecerGuardar, mostrarTabla: mostrarTabla, tukipoints: tukipoints, sonido: sonido };
 
   function registrar(juego){ lista.push(juego); }
 
@@ -293,8 +297,15 @@ var Juegos = (function(){
       try { localStorage.setItem("tema", t); } catch (e) {}
       etiqueta();
       window.dispatchEvent(new Event("cambio-tema"));
+      sonido.efecto("clic");
     });
     etiqueta();
+    sonido.cancion("sala");
+    sonido.botones($(".barra-juegos"), b);
+    // Clic suave al moverse por la sala
+    document.addEventListener("click", function(e){
+      if (e.target.closest && e.target.closest(".tarjeta-juego, #nav-juegos a, .volver, .pildoras button")) sonido.efecto("clic");
+    });
     window.addEventListener("hashchange", abrir);
     pintarNav();
     abrir();

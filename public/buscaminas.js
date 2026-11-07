@@ -77,6 +77,7 @@ Juegos.registrar({
         var vs = vecinos(i), nb = vs.filter(function(v){ return banderas.has(v); }).length;
         if (nb === cuenta(i)) vs.forEach(function(v){ if (!abiertas.has(v) && !banderas.has(v)) abrir(v); });
       } else abrir(i);
+      if (!fin) api.sonido.efecto("abrir");
       revisar();
     }
     function abrir(i){
@@ -97,10 +98,12 @@ Juegos.registrar({
       if (banderas.has(i)){ banderas.delete(i); celdas[i].className = "celda-mina"; celdas[i].textContent = ""; }
       else { banderas.add(i); celdas[i].className = "celda-mina bandera"; celdas[i].textContent = "⚑"; }
       celdas[i].setAttribute("aria-label", banderas.has(i) ? "Bandera" : "Tapada");
+      api.sonido.efecto(banderas.has(i) ? "bandera" : "clic");
       minasEl.textContent = String(NIVELES[nivel].minas - banderas.size);
     }
     function perder(i){
       fin = true; clearInterval(reloj);
+      api.sonido.efecto("boom");
       minas.forEach(function(m){ var b = celdas[m]; b.className = "celda-mina mina" + (m === i ? " explotada" : ""); b.textContent = "✹"; });
       banderas.forEach(function(f){ if (!minas.has(f)) { celdas[f].className = "celda-mina error"; celdas[f].textContent = "✕"; } });
       celdas.forEach(function(b){ b.disabled = true; });
@@ -114,6 +117,7 @@ Juegos.registrar({
         var segundos = Math.max(1, Math.round((Date.now() - inicio) / 1000)); tiempoEl.textContent = String(segundos);
         minas.forEach(function(m){ celdas[m].className = "celda-mina bandera"; celdas[m].textContent = "⚑"; celdas[m].disabled = true; });
         var r = api.record("buscaminas-" + nivel, segundos, true);
+        api.sonido.efecto(r.nuevo ? "record" : "ganar");
         estadoEl.textContent = "¡Despejaste el tablero en " + segundos + " s!" + (r.nuevo ? " Nuevo récord." : "");
         api.ofrecerGuardar("buscaminas-" + nivel, segundos);
       }

@@ -66,6 +66,7 @@ Juegos.registrar({
       serpiente.unshift(cab);
       if (come){
         puntos += 10; puntosEl.textContent = api.miles(puntos);
+        api.sonido.efecto("comer");
         intervalo = Math.max(65, intervalo - 3);
         if (serpiente.length === N * N) return terminar(true);
         ponerComida();
@@ -75,6 +76,7 @@ Juegos.registrar({
     function terminar(gano){
       estado = "fin"; cancelAnimationFrame(raf); dibujar();
       var r = api.record("snake", puntos, false);
+      api.sonido.efecto(gano ? "grande" : r.nuevo ? "record" : "morir");
       recordEl.textContent = api.miles(r.record);
       mostrarCapa(gano ? "¡Llenaste el tablero!" : "Fin del juego", api.miles(puntos) + " puntos" + (r.nuevo ? " · ¡nuevo récord!" : ""), "Otra vez");
       if (puntos > 0) api.ofrecerGuardar("snake", puntos);

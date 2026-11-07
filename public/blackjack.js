@@ -35,7 +35,7 @@ Juegos.registrar({
       for (var m = 0; m < 4; m++) PALOS.forEach(function(p){ VALORES.forEach(function(v){ mazo.push({ v: v, p: p[0], color: p[1] }); }); });
       for (var i = mazo.length - 1; i > 0; i--){ var j = Math.floor(Math.random() * (i + 1)); var t = mazo[i]; mazo[i] = mazo[j]; mazo[j] = t; }
     }
-    function sacar(){ if (mazo.length < 20) nuevoMazo(); return mazo.pop(); }
+    function sacar(){ if (mazo.length < 20) nuevoMazo(); api.sonido.efecto("carta"); return mazo.pop(); }
     function total(mano){
       var t = 0, ases = 0;
       mano.forEach(function(c){ if (c.oculta) return; if (c.v === "A"){ ases++; t += 11; } else t += ["J", "Q", "K"].indexOf(c.v) >= 0 ? 10 : +c.v; });
@@ -57,7 +57,7 @@ Juegos.registrar({
       controles.textContent = "";
       if (fase === "apostar" || fase === "fin"){
         [10, 50, 100].forEach(function(n){
-          controles.appendChild(el("button", { type: "button", clase: "boton secundario chico", texto: "+" + n, disabled: apuesta + n > fichas, onclick: function(){ apuesta = Math.min(fichas, apuesta + n); pintar(); } }));
+          controles.appendChild(el("button", { type: "button", clase: "boton secundario chico", texto: "+" + n, disabled: apuesta + n > fichas, onclick: function(){ apuesta = Math.min(fichas, apuesta + n); api.sonido.efecto("ficha"); pintar(); } }));
         });
         controles.appendChild(el("button", { type: "button", clase: "boton secundario chico", texto: "Limpiar", onclick: function(){ apuesta = 0; pintar(); } }));
         controles.appendChild(el("button", { type: "button", clase: "boton", texto: "Repartir", disabled: apuesta < 10 || apuesta > fichas, onclick: repartir }));
@@ -103,6 +103,7 @@ Juegos.registrar({
       else if (tj < tc){ gana = -apuesta; texto = "Gana el crupier. Pierdes " + api.miles(apuesta) + "."; }
       else texto = "Empate: recuperas tu apuesta.";
       fichas += gana;
+      api.sonido.efecto(bjJ && !bjC ? "grande" : gana > 0 ? "ganar" : gana < 0 ? "perder" : "empate");
       if (doblada) apuesta = Math.floor(apuesta / 2);
       apuesta = Math.min(apuesta, fichas);
       var r = guardarFichas();
