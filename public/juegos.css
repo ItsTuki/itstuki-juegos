@@ -1,0 +1,142 @@
+/* Sala de juegos */
+[hidden]{display:none!important}
+[data-tema="noche"] .ico-luna,:root:not([data-tema="noche"]) .ico-sol{display:none}
+
+#escenario:focus{outline:none}
+.pagina-juegos{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:.75rem clamp(.6rem,3vw,1.5rem) calc(1.5rem + env(safe-area-inset-bottom,0px))}
+
+/* Barra */
+.barra-juegos{
+  position:sticky;top:.5rem;z-index:20;display:flex;align-items:center;gap:.5rem;padding:.45rem;margin-bottom:1.25rem;
+  background:color-mix(in srgb,var(--panel) 90%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border:2px solid var(--borde);border-radius:999px;box-shadow:4px 4px 0 var(--sombra);
+}
+.marca{display:flex;align-items:center;gap:.5rem;text-decoration:none;color:var(--texto);flex:none;padding-right:.25rem}
+.marca img{width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid var(--borde)}
+.marca span{font:1.6rem/1 var(--pixel);white-space:nowrap}
+.marca em{font-style:normal;color:var(--rosa)}
+.nav-juegos{display:flex;gap:.25rem;overflow-x:auto;flex:1;min-width:0;scrollbar-width:none}
+.nav-juegos::-webkit-scrollbar{display:none}
+.nav-juegos a{flex:none;display:inline-flex;align-items:center;min-height:44px;padding:0 .9rem;border-radius:999px;text-decoration:none;color:var(--texto);font-weight:800;font-size:.95rem}
+.nav-juegos a:hover{background:var(--panel-2)}
+.nav-juegos a[aria-current="page"]{background:var(--texto);color:var(--panel)}
+@media (max-width:560px){.marca span{display:none}}
+
+/* Sala */
+.sala{display:grid;gap:1.25rem}
+.bienvenida p{color:var(--suave);font-size:1.05rem;max-width:60ch}
+.bienvenida em{font-style:normal;color:var(--rosa);font-weight:800}
+.tarjetas-juego{list-style:none;display:grid;gap:1rem;grid-template-columns:repeat(auto-fill,minmax(min(100%,13.5rem),1fr))}
+.tarjeta-juego{
+  height:100%;display:grid;gap:.35rem;align-content:start;padding:1rem;text-decoration:none;color:var(--texto);
+  background:var(--panel);border:2px solid var(--borde);border-radius:var(--radio);box-shadow:5px 5px 0 var(--sombra);
+  transition:transform .12s ease,box-shadow .12s ease;
+}
+.tarjeta-juego:hover{transform:translate(-2px,-2px);box-shadow:7px 7px 0 var(--sombra)}
+.icono-juego{
+  display:grid;place-items:center;height:5.5rem;margin-bottom:.4rem;border-radius:var(--radio-chico);
+  font:400 3.4rem/1 var(--pixel);color:#fff;border:2px solid var(--texto);
+  background:linear-gradient(135deg,var(--cielo-a),var(--cielo-b));text-shadow:3px 3px 0 #1d1745;
+}
+.icono-gato{background:linear-gradient(135deg,#5a4fd6,#d4479b)}
+.icono-blackjack{background:linear-gradient(135deg,#14804a,#0d5a33)}
+.icono-2048{background:linear-gradient(135deg,#e8a500,#d4479b);font-size:2.6rem}
+.icono-buscaminas{background:linear-gradient(135deg,#2d2580,#1d63ed)}
+.nombre-juego{font:400 1.7rem/1 var(--pixel)}
+.desc-juego{color:var(--suave);font-size:.92rem;line-height:1.4}
+.record-juego{margin-top:.3rem;font-size:.85rem;font-weight:800;color:var(--acento)}
+
+/* Juego + panel */
+.juego-layout{display:grid;gap:1.25rem;align-items:start}
+@media (min-width:900px){.juego-layout{grid-template-columns:minmax(0,1fr) 19rem}}
+.ventana-juego .widget-titulo{justify-content:flex-start}
+.ventana-juego .widget-titulo .puntos{margin-left:auto}
+.volver{display:inline-flex;align-items:center;min-height:36px;padding:0 .7rem;margin-right:.5rem;border-radius:999px;border:2px solid var(--titulo-tinta);color:var(--titulo-tinta);text-decoration:none;font-size:1.2rem}
+#contenedor-juego{display:grid;gap:.9rem;justify-items:center}
+.marcador{display:flex;flex-wrap:wrap;justify-content:center;gap:.5rem}
+.marcador span{background:var(--panel-2);border:2px solid var(--borde);border-radius:999px;padding:.3rem .9rem;font-weight:700;font-size:.95rem}
+.marcador b{font:400 1.45rem/1 var(--pixel);color:var(--acento);margin-left:.25rem}
+.estado-juego{font-weight:800;text-align:center;min-height:1.6em}
+.ayuda-juego{font-size:.875rem;color:var(--suave);text-align:center;max-width:46ch}
+.fila-botones{display:flex;flex-wrap:wrap;gap:.5rem}
+.fila-botones.centrado{justify-content:center}
+.pildoras{display:flex;flex-wrap:wrap;gap:.4rem;justify-content:center}
+.pildoras button{min-height:44px;padding:0 1rem;border-radius:999px;cursor:pointer;border:2px solid var(--borde);background:var(--panel);color:var(--texto);font-weight:800;font-size:.95rem}
+.pildoras button[aria-pressed="true"]{background:var(--texto);color:var(--panel);border-color:var(--texto)}
+.capa-juego{position:absolute;inset:0;display:grid;place-content:center;justify-items:center;gap:.4rem;text-align:center;padding:1rem;background:color-mix(in srgb,var(--panel) 86%,transparent);border-radius:inherit}
+.capa-juego b{font:400 2.4rem/1 var(--pixel)}
+.capa-juego p{color:var(--suave);font-weight:700;margin-bottom:.4rem}
+
+/* Cruceta táctil */
+.cruceta{display:grid;grid-template-columns:repeat(3,56px);grid-template-rows:repeat(2,56px);gap:.35rem;justify-content:center}
+.cruceta button{border-radius:14px;border:2px solid var(--texto);background:var(--panel);color:var(--texto);font-size:1.3rem;cursor:pointer;box-shadow:3px 3px 0 var(--texto);touch-action:manipulation}
+.cruceta button:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--texto)}
+.cruz-arriba{grid-column:2;grid-row:1}.cruz-izquierda{grid-column:1;grid-row:2}.cruz-abajo{grid-column:2;grid-row:2}.cruz-derecha{grid-column:3;grid-row:2}
+@media (min-width:700px) and (hover:hover) and (pointer:fine){.cruceta{display:none}}
+
+/* Snake */
+.marco-lienzo{position:relative;width:min(100%,440px);border:3px solid var(--texto);border-radius:12px;overflow:hidden;box-shadow:5px 5px 0 var(--sombra);touch-action:none}
+.lienzo-snake{display:block;width:100%;height:auto;aspect-ratio:1;image-rendering:pixelated}
+
+/* Gato */
+.grilla-gato{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:.5rem;width:min(100%,330px);aspect-ratio:1}
+.celda-gato{min-width:0;min-height:0;padding:0;border-radius:14px;border:2px solid var(--borde);background:var(--panel-2);font:400 clamp(3rem,14vw,4.6rem)/1 var(--pixel);cursor:pointer;color:var(--texto)}
+.celda-gato:not(:disabled):hover{border-color:var(--acento)}
+.celda-gato:disabled{cursor:default}
+.celda-gato.ficha-x{color:var(--acento)}
+.celda-gato.ficha-o{color:var(--rosa)}
+.celda-gato.gana{background:var(--chispa);color:#1d1745;border-color:#1d1745}
+
+/* Blackjack */
+.mesa{width:100%;display:grid;gap:1rem;padding:1rem;border-radius:var(--radio);border:3px solid #0b3d24;background:radial-gradient(ellipse at center,#1f8a50 0%,#14663b 70%);color:#f2fff6}
+.lado-mesa h3{font:400 1.5rem/1 var(--pixel);margin-bottom:.5rem}
+.total-mano{color:#ffe08a}
+.mano{display:flex;flex-wrap:wrap;gap:.45rem;min-height:5.4rem}
+.carta{position:relative;width:3.7rem;height:5.3rem;border-radius:9px;background:#fffdf8;border:2px solid #1d1745;box-shadow:2px 2px 0 rgba(0,0,0,.35);color:#1d1745;animation:reparte .2s ease-out}
+.carta.rojo{color:#c0162f}
+.carta .esq{position:absolute;top:.2rem;left:.3rem;font-weight:800;font-size:.9rem}
+.carta .palo{position:absolute;inset:0;display:grid;place-items:center;font-size:2rem;padding-top:.6rem}
+.carta.oculta{background:repeating-linear-gradient(45deg,#5a4fd6 0 8px,#7f52ff 8px 16px)}
+@keyframes reparte{from{transform:translateY(-8px);opacity:0}}
+.controles-bj{min-height:46px}
+
+/* 2048 */
+.marco-2048{position:relative;width:min(100%,420px);touch-action:none;border-radius:16px}
+.tablero-2048{display:grid;grid-template-columns:repeat(4,1fr);gap:.55rem;padding:.55rem;aspect-ratio:1;border-radius:16px;background:var(--borde);border:3px solid var(--texto);box-shadow:5px 5px 0 var(--sombra)}
+.ficha-2048{display:grid;place-items:center;border-radius:10px;background:var(--panel-2);font:400 clamp(1.6rem,8vw,2.8rem)/1 var(--pixel);color:#1d1745}
+.ficha-2048.v2{background:#f3eefe}.ficha-2048.v4{background:#e3d9ff}.ficha-2048.v8{background:#c7d2ff}.ficha-2048.v16{background:#a9b8ff}
+.ficha-2048.v32{background:#f6cdf2}.ficha-2048.v64{background:#f0a6e2}.ficha-2048.v128{background:#ffe08a}.ficha-2048.v256{background:#ffd166}
+.ficha-2048.v512{background:#ffb347}.ficha-2048.v1024{background:#ff8fab;color:#fff}.ficha-2048.v2048{background:#d4479b;color:#fff}.ficha-2048.v4096{background:#5a4fd6;color:#fff}
+.ficha-2048.nueva{animation:aparece-ficha .15s ease-out}
+.ficha-2048.unida{animation:une-ficha .18s ease-out}
+@keyframes aparece-ficha{from{transform:scale(.4)}}
+@keyframes une-ficha{50%{transform:scale(1.12)}}
+
+/* Buscaminas */
+.marco-minas{max-width:100%;overflow-x:auto;padding:4px}
+.tablero-minas{--columnas:9;display:grid;grid-template-columns:repeat(var(--columnas),var(--tam));gap:3px;--tam:min(40px,calc((100vw - 6rem - (var(--columnas) - 1) * 3px) / var(--columnas)))}
+.tablero-minas.nivel-medio{--tam:min(34px,calc((100vw - 6rem - (var(--columnas) - 1) * 3px) / var(--columnas)))}
+.celda-mina{width:var(--tam);height:var(--tam);border-radius:6px;border:2px solid var(--borde);background:var(--panel);box-shadow:inset -2px -2px 0 rgba(0,0,0,.18);font:400 calc(var(--tam) * .75)/1 var(--pixel);color:var(--texto);cursor:pointer;padding:0;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+.celda-mina.abierta{background:var(--panel-2);box-shadow:none;cursor:default}
+.celda-mina.bandera{color:var(--rosa)}
+.celda-mina.mina{background:#1d1745;color:#ffd166}
+.celda-mina.explotada{background:#b3261e;color:#fff}
+.celda-mina.error{color:var(--error)}
+.n1{color:#4553d0!important}.n2{color:#14804a!important}.n3{color:#c0162f!important}.n4{color:#2d2580!important}.n5{color:#a1123b!important}.n6{color:#2d7d9a!important}
+[data-tema="noche"] .n1{color:#9fb4ff!important}[data-tema="noche"] .n2{color:#7fe0a8!important}[data-tema="noche"] .n3{color:#ff9a90!important}[data-tema="noche"] .n4{color:#c9b8ff!important}
+
+/* Tabla de posiciones */
+.mi-record{font-weight:800;margin:.6rem 0 .4rem}
+.lista-posiciones{list-style:none;display:grid;gap:.3rem}
+.lista-posiciones li{display:flex;align-items:center;gap:.6rem;padding:.45rem .7rem;border-radius:var(--radio-chico);background:var(--panel-2);border:2px solid transparent}
+.lista-posiciones li.yo{border-color:var(--chispa)}
+.lista-posiciones .lugar{width:1.8rem;text-align:center;font:400 1.35rem/1 var(--pixel);color:var(--suave)}
+.lista-posiciones li:nth-child(-n+3) .lugar{color:var(--chispa)}
+.lista-posiciones .quien{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700}
+.lista-posiciones b{font:400 1.3rem/1 var(--pixel);color:var(--acento)}
+.tabla-vacia,.cargando-tabla{color:var(--suave);font-size:.92rem;padding:.6rem 0}
+.guardar-puntaje{display:grid;gap:.6rem;padding:.8rem;margin:.4rem 0 .8rem;border:2px dashed var(--chispa);border-radius:var(--radio-chico);background:color-mix(in srgb,var(--chispa) 10%,var(--panel))}
+.tabla-sala .pildoras,.panel-posiciones .pildoras{justify-content:flex-start;margin-bottom:.5rem}
+
+.pie-juegos{margin-top:2rem;text-align:center;font:1.2rem/1.6 var(--pixel);color:var(--suave)}
+.pie-juegos a{color:var(--acento)}

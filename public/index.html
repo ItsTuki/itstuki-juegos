@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>✦ Sala de juegos · ItsTuki ✦</title>
+<meta name="description" content="Juegos para el navegador con tabla de posiciones: Snake, 3 en raya, Blackjack, 2048 y Buscaminas.">
+<meta name="theme-color" content="#120f2e">
+<link rel="icon" type="image/png" href="/favicon.png">
+<script src="/tema.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&family=VT323&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/base.css">
+<link rel="stylesheet" href="/juegos.css">
+</head>
+<body>
+<div class="estrellas" aria-hidden="true">
+  <span style="top:9%;left:5%">✦</span><span style="top:22%;left:93%">★</span><span style="top:68%;left:3%">✧</span>
+  <span style="top:86%;left:91%">✦</span><span style="top:46%;left:97%">✧</span><span style="top:5%;left:58%">★</span>
+</div>
+
+<div class="pagina-juegos">
+  <header class="barra-juegos">
+    <a class="marca" href="#">
+      <img src="/tuki.webp" alt="" width="40" height="40">
+      <span>sala de <em>juegos</em></span>
+    </a>
+    <nav class="nav-juegos" aria-label="Juegos" id="nav-juegos"></nav>
+    <button class="icono-boton" id="cambiar-tema" type="button" aria-label="Cambiar tema">
+      <svg class="ico-sol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>
+      <svg class="ico-luna" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z"/></svg>
+    </button>
+  </header>
+
+  <main id="escenario" tabindex="-1">
+    <!-- Sala -->
+    <section id="sala" class="sala" aria-labelledby="t-sala">
+      <div class="widget bienvenida">
+        <h1 class="widget-titulo" id="t-sala">~ sala de juegos <span class="puntos" aria-hidden="true"><i></i><i></i></span></h1>
+        <div class="widget-cuerpo">
+          <p>Elige un juego. Se juega con el teclado o con el dedo, tu récord queda guardado en este navegador y los mejores puntajes entran a la <em>tabla de posiciones</em>.</p>
+        </div>
+      </div>
+      <ul class="tarjetas-juego" id="tarjetas-juego"></ul>
+      <section class="widget tabla-sala" aria-labelledby="t-tabla-sala">
+        <h2 class="widget-titulo" id="t-tabla-sala">~ tabla de posiciones</h2>
+        <div class="widget-cuerpo" id="posiciones-sala"></div>
+      </section>
+    </section>
+
+    <!-- Juego activo -->
+    <section id="juego" class="juego-layout" hidden>
+      <div class="widget ventana-juego">
+        <h1 class="widget-titulo">
+          <a class="volver" href="#" aria-label="Volver a la sala">‹ sala</a>
+          <span id="titulo-juego">~ juego</span>
+          <span class="puntos" aria-hidden="true"><i></i><i></i></span>
+        </h1>
+        <div class="widget-cuerpo" id="contenedor-juego"></div>
+      </div>
+      <aside class="widget panel-posiciones" aria-labelledby="t-posiciones">
+        <h2 class="widget-titulo" id="t-posiciones">~ posiciones</h2>
+        <div class="widget-cuerpo" id="posiciones-juego"></div>
+      </aside>
+    </section>
+  </main>
+
+  <footer class="pie-juegos" id="pie-juegos">
+    <span>hecho a mano por <a href="https://itstuki.cl/">ItsTuki</a></span> <span aria-hidden="true">✦</span>
+    <a href="https://github.com/ItsTuki/itstuki-juegos">código en GitHub</a>
+  </footer>
+</div>
+
+<div class="avisos" id="avisos" aria-live="polite"></div>
+<script src="/juegos.js"></script>
+<script src="/snake.js"></script>
+<script src="/gato.js"></script>
+<script src="/blackjack.js"></script>
+<script src="/2048.js"></script>
+<script src="/buscaminas.js"></script>
+<script src="/iniciar.js"></script>
+</body>
+</html>

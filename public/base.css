@@ -1,0 +1,182 @@
+/* ItsTuki · estilos compartidos (portafolio y webmail)
+   Tema "noche" por defecto según el sistema; el botón de tema lo recuerda. */
+
+:root{
+  --pixel:"VT323",ui-monospace,monospace;
+  --sans:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --radio:14px;
+  --radio-chico:10px;
+}
+
+/* Día */
+:root,[data-tema="dia"]{
+  --fondo:#efe9ff;
+  --fondo-punto:#d9cdfb;
+  --panel:#ffffff;
+  --panel-2:#f7f3ff;
+  --borde:#b9a9f0;
+  --sombra:#9c8ae6;
+  --texto:#231b4d;
+  --suave:#5d5490;
+  --acento:#4553d0;
+  --acento-tinta:#ffffff;
+  --chispa:#e8a500;
+  --rosa:#d4479b;
+  --titulo-a:#c7d2ff;
+  --titulo-b:#f6cdf2;
+  --titulo-tinta:#231b4d;
+  --cielo-a:#7d8cff;
+  --cielo-b:#f4a9de;
+  --cielo-c:#ffe3a3;
+  --pie:#1d1745;
+  --pie-tinta:#e9e4ff;
+  --ok:#14804a;
+  --error:#b3261e;
+  color-scheme:light;
+}
+/* Noche */
+[data-tema="noche"]{
+  --fondo:#120f2e;
+  --fondo-punto:#2a2463;
+  --panel:#1c1844;
+  --panel-2:#241f55;
+  --borde:#4a42a0;
+  --sombra:#07051a;
+  --texto:#f1edff;
+  --suave:#b9b1e6;
+  --acento:#9fb4ff;
+  --acento-tinta:#120f2e;
+  --chispa:#ffd166;
+  --rosa:#ff9ed8;
+  --titulo-a:#8ea4ff;
+  --titulo-b:#e9a6ec;
+  --titulo-tinta:#120f2e;
+  --cielo-a:#1b1660;
+  --cielo-b:#5a2f8f;
+  --cielo-c:#d1679e;
+  --pie:#0a081d;
+  --pie-tinta:#d9d3ff;
+  --ok:#7fe0a8;
+  --error:#ff9a90;
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:5rem;-webkit-text-size-adjust:100%}
+body{
+  font:1rem/1.6 var(--sans);
+  color:var(--texto);
+  background-color:var(--fondo);
+  background-image:radial-gradient(var(--fondo-punto) 1.2px,transparent 1.3px);
+  background-size:18px 18px;
+  min-height:100vh;
+}
+img,video,svg{display:block;max-width:100%}
+a{color:var(--acento)}
+button,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--chispa);outline-offset:2px;border-radius:6px}
+.solo-lector{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* Estrellas decorativas fijas */
+.estrellas{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.estrellas span{position:absolute;color:var(--chispa);opacity:.55;font-size:1.1rem;animation:titila 5s ease-in-out infinite}
+.estrellas span:nth-child(3n){color:var(--rosa);font-size:.9rem;animation-delay:-2s}
+.estrellas span:nth-child(4n){color:var(--acento);font-size:1.4rem;animation-delay:-3.5s}
+@keyframes titila{0%,100%{opacity:.25}50%{opacity:.75}}
+
+/* Widgets tipo ventana */
+.widget{
+  position:relative;z-index:1;
+  background:var(--panel);
+  border:2px solid var(--borde);
+  border-radius:var(--radio);
+  box-shadow:5px 5px 0 var(--sombra);
+  overflow:hidden;
+}
+.widget-titulo{
+  display:flex;align-items:center;justify-content:space-between;gap:.5rem;
+  font:400 1.45rem/1 var(--pixel);
+  letter-spacing:.02em;
+  color:var(--titulo-tinta);
+  background:linear-gradient(90deg,var(--titulo-a),var(--titulo-b));
+  padding:.5rem .9rem .45rem;
+  border-bottom:2px dashed var(--borde);
+}
+.widget-titulo .puntos{display:flex;gap:5px}
+.widget-titulo .puntos i{width:11px;height:11px;border-radius:50%;background:var(--panel);border:2px solid var(--titulo-tinta);opacity:.7}
+.widget-cuerpo{padding:1rem}
+
+/* Etiquetas */
+.etiquetas{display:flex;flex-wrap:wrap;gap:.4rem}
+.etiqueta{
+  display:inline-flex;align-items:center;gap:.35rem;
+  font-size:.875rem;font-weight:700;line-height:1.2;
+  padding:.3rem .7rem;border-radius:999px;
+  background:var(--panel-2);color:var(--texto);
+  border:1.5px dashed var(--borde);
+}
+
+/* Botones en píldora */
+.boton{
+  display:inline-flex;align-items:center;justify-content:center;gap:.5rem;
+  min-height:46px;padding:.55rem 1.25rem;
+  border-radius:999px;border:2px solid var(--texto);
+  background:var(--acento);color:var(--acento-tinta);
+  font-weight:800;font-size:1rem;text-decoration:none;cursor:pointer;
+  box-shadow:3px 3px 0 var(--texto);
+  transition:transform .12s ease,box-shadow .12s ease;
+}
+.boton:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--texto)}
+.boton:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--texto)}
+.boton.secundario{background:var(--panel);color:var(--texto)}
+.boton.chico{min-height:44px;padding:.4rem 1rem;font-size:.95rem}
+.boton[disabled]{opacity:.55;cursor:not-allowed;transform:none}
+.boton svg{width:20px;height:20px;flex:none}
+
+.icono-boton{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:44px;height:44px;border-radius:999px;flex:none;
+  border:2px solid var(--borde);background:var(--panel);color:var(--texto);cursor:pointer;
+}
+.icono-boton:hover{border-color:var(--acento);color:var(--acento)}
+.icono-boton svg{width:20px;height:20px}
+
+/* Campos */
+.campo{display:grid;gap:.35rem}
+.campo label{font-weight:700;font-size:.95rem}
+.campo input,.campo textarea{
+  width:100%;min-height:46px;font-size:16px;
+  padding:.6rem .9rem;border-radius:var(--radio-chico);
+  border:2px solid var(--borde);background:var(--panel-2);color:var(--texto);
+}
+.campo input:focus,.campo textarea:focus{outline:none;border-color:var(--acento);box-shadow:0 0 0 3px color-mix(in srgb,var(--acento) 30%,transparent)}
+
+/* Banda que se desplaza */
+.banda{
+  position:relative;z-index:2;overflow:hidden;white-space:nowrap;
+  background:var(--pie);color:var(--pie-tinta);
+  font:1.2rem/1 var(--pixel);letter-spacing:.04em;
+  padding:.45rem 0;border-bottom:2px solid var(--borde);
+}
+.banda-pista{display:inline-flex;animation:desliza 40s linear infinite}
+.banda-pista span{padding-right:2rem}
+.banda:hover .banda-pista,.banda:focus-within .banda-pista,.banda.pausada .banda-pista{animation-play-state:paused}
+@keyframes desliza{to{transform:translateX(-50%)}}
+
+/* Avisos */
+.avisos{position:fixed;left:50%;bottom:calc(1rem + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:100;display:grid;gap:.5rem;width:min(92vw,26rem)}
+.aviso{
+  background:var(--pie);color:var(--pie-tinta);border:2px solid var(--borde);
+  border-radius:var(--radio-chico);padding:.75rem 1rem;font-weight:700;
+  box-shadow:4px 4px 0 var(--sombra);animation:aparece .2s ease-out;
+}
+.aviso.error{border-color:var(--error)}
+@keyframes aparece{from{opacity:0;transform:translateY(8px)}}
+
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .banda{white-space:normal}
+  .banda-pista span+span{display:none}
+}
