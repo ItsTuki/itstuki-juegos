@@ -88,7 +88,7 @@ await p.click('[data-apuesta="n17"]');
 ok((await p.textContent('[data-apuesta="rojo"] .monto-pano')) === "50", "ruleta: la ficha queda en la casilla");
 await p.screenshot({ path: CAPS + "/ruleta-apuesta.png" });
 await p.click("text=Girar");
-await p.waitForFunction(() => /Salió el \d+/.test(document.querySelector(".estado-juego").textContent), null, { timeout: 8000 });
+await p.waitForFunction(() => /Salió el \d+/.test(document.querySelector(".estado-juego").textContent), null, { timeout: 10000 });
 const tirada = await p.evaluate(() => {
   const n = +document.querySelector(".resultado-rueda").textContent;
   return { n, saldo: Juegos.api.tukipoints.saldo(), texto: document.querySelector(".estado-juego").textContent };
@@ -97,6 +97,15 @@ const ROJOS = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36
 const esperado = saldoAntes - 100 + (ROJOS.includes(tirada.n) ? 100 : 0) + (tirada.n === 17 ? 1800 : 0);
 ok(tirada.saldo === esperado, "ruleta: paga bien la tirada", tirada.texto);
 await p.screenshot({ path: CAPS + "/ruleta.png" });
+// Regresión: apostar al negro y que salga negro (antes "negro" se tomaba como pleno y siempre perdía)
+await p.evaluate(() => { crypto.getRandomValues = (a) => { a[0] = 2; return a; }; }); // ORDEN[2] = 15, negro
+const antesNegro = await p.evaluate(() => Juegos.api.tukipoints.saldo());
+await p.click('[data-ficha="10"]');
+await p.click('[data-apuesta="negro"]');
+await p.click("text=Girar");
+await p.waitForFunction(() => /Salió el 15/.test(document.querySelector(".estado-juego").textContent), null, { timeout: 10000 });
+ok(await p.evaluate(() => Juegos.api.tukipoints.saldo()) === antesNegro + 10, "ruleta: apostar al negro paga cuando sale negro");
+ok(await p.isVisible(".bola-rueda") && await p.isVisible(".resalte-rueda"), "ruleta: la bola queda en la casilla ganadora y se ilumina");
 
 // 2048
 await p.click('#nav-juegos a[href="#2048"]');

@@ -33,7 +33,8 @@ Juegos.registrar({
       ["alto", "19 a 36", 1, function(n){ return n >= 19; }]
     ];
     function datosApuesta(clave){
-      if (clave.charAt(0) === "n"){ var n = +clave.slice(1); return { texto: "Pleno al " + n, pago: 35, gana: function(x){ return x === n; } }; }
+      // Plenos: "n0" a "n36". Ojo: "negro" también empieza con "n", por eso se compara el formato completo
+      if (/^n\d+$/.test(clave)){ var n = +clave.slice(1); return { texto: "Pleno al " + n, pago: 35, gana: function(x){ return x === n; } }; }
       for (var i = 0; i < AFUERA.length; i++) if (AFUERA[i][0] === clave) return { texto: AFUERA[i][1], pago: AFUERA[i][2], gana: AFUERA[i][3] };
       return null;
     }
@@ -45,17 +46,25 @@ Juegos.registrar({
     function nodo(tag, attrs){ var n = document.createElementNS(SVG, tag); Object.keys(attrs || {}).forEach(function(k){ n.setAttribute(k, attrs[k]); }); return n; }
     function punto(r, grados){ var a = (grados - 90) * Math.PI / 180; return (100 + r * Math.cos(a)).toFixed(2) + " " + (100 + r * Math.sin(a)).toFixed(2); }
     var svg = nodo("svg", { viewBox: "0 0 200 200", "class": "rueda", "aria-hidden": "true" });
-    var disco = nodo("g", { "class": "disco" });
+    var disco = nodo("g", { "class": "disco" }), casillasRueda = [];
     ORDEN.forEach(function(n, i){
       var a0 = i * GRADOS - GRADOS / 2, a1 = a0 + GRADOS;
-      disco.appendChild(nodo("path", { d: "M100 100 L" + punto(96, a0) + " A96 96 0 0 1 " + punto(96, a1) + " Z", "class": "casilla-rueda " + color(n) }));
+      var c = nodo("path", { d: "M100 100 L" + punto(96, a0) + " A96 96 0 0 1 " + punto(96, a1) + " Z", "class": "casilla-rueda " + color(n) });
+      casillasRueda.push(c); disco.appendChild(c);
       var t = nodo("text", { x: "100", y: "17", "class": "numero-rueda", transform: "rotate(" + (i * GRADOS) + " 100 100)" });
       t.textContent = String(n);
       disco.appendChild(t);
     });
+    disco.appendChild(nodo("circle", { cx: "100", cy: "100", r: "76", "class": "pista-rueda" }));
+    var resalte = nodo("path", { "class": "resalte-rueda" });
+    resalte.style.display = "none";
+    disco.appendChild(resalte);
     disco.appendChild(nodo("circle", { cx: "100", cy: "100", r: "62", "class": "centro-rueda" }));
     disco.appendChild(nodo("circle", { cx: "100", cy: "100", r: "20", "class": "eje-rueda" }));
     svg.appendChild(disco);
+    var bolaRueda = nodo("circle", { cx: "100", cy: "9", r: "4.3", "class": "bola-rueda" });
+    bolaRueda.style.display = "none";
+    svg.appendChild(bolaRueda);
     var bola = el("b", { clase: "resultado-rueda", texto: "?" });
     var rueda = el("div", { clase: "marco-rueda" }, [ svg, el("span", { clase: "flecha-rueda", "aria-hidden": "true" }), bola ]);
 
@@ -137,7 +146,45 @@ Juegos.registrar({
       apuestas = Object.assign({}, ultimas); pintar();
     }
 
-    var espera = null;
+    /* ---------- Animación del giro ----------
+       La rueda gira a la derecha y frena; la bola corre al revés por el borde, pierde fuerza, cae
+       rebotando hacia las casillas y termina en la ganadora, que queda justo bajo la flecha.
+       Con "reducir movimiento" del sistema el giro es más corto y suave, pero se ve igual. */
+    var anim = null, bolaAng = 0, bolaVisible = false;
+    function easeOut(t){ return 1 - Math.pow(1 - t, 3); }
+    function ponerRueda(grados){ disco.setAttribute("transform", "rotate(" + grados.toFixed(3) + " 100 100)"); }
+    function ponerBola(grados, r){
+      var a = grados * Math.PI / 180;
+      bolaRueda.setAttribute("cx", (100 + r * Math.sin(a)).toFixed(2));
+      bolaRueda.setAttribute("cy", (100 - r * Math.cos(a)).toFixed(2));
+    }
+    function animar(i, alTerminar){
+      var DURA = quieto ? 2400 : 5600, VUELTAS = quieto ? 1 : 4, VUELTAS_BOLA = quieto ? 1 : 3, CAE = 0.55, ENTRA = 0.8;
+      var w0 = giro, destino = ((-i * GRADOS - w0) % 360 + 360) % 360, dw = VUELTAS * 360 + destino;
+      // La bola parte donde quedó la anterior (o arriba la primera vez)
+      var bola0 = bolaVisible ? bolaAng : 0, casilla0 = w0 + i * GRADOS;
+      var R = ((bola0 - casilla0) % 360 + 360) % 360 + VUELTAS_BOLA * 360;
+      bolaRueda.style.display = ""; bolaVisible = true;
+      resalte.style.display = "none";
+      var t0 = null;
+      function cuadro(ahora){
+        if (t0 === null) t0 = ahora;
+        var t = Math.min(1, (ahora - t0) / DURA);
+        var w = w0 + dw * easeOut(t), casilla = w + i * GRADOS;
+        var u = Math.min(1, t / ENTRA), ang = casilla + R * (1 - easeOut(u)), radio = 91;
+        if (t >= ENTRA) radio = 72;
+        else if (t > CAE){
+          var p = (t - CAE) / (ENTRA - CAE), rebote = Math.abs(Math.sin(p * Math.PI * 3)) * (1 - p);
+          radio = 91 - 19 * p + 6 * rebote;
+          ang += 5 * Math.sin(p * Math.PI * 3) * (1 - p);
+        }
+        ponerRueda(w); ponerBola(ang, radio); bolaAng = ang;
+        if (t < 1) anim = requestAnimationFrame(cuadro);
+        else { anim = null; giro = w; resalte.setAttribute("d", casillasRueda[i].getAttribute("d")); resalte.style.display = ""; alTerminar(); }
+      }
+      anim = requestAnimationFrame(cuadro);
+    }
+
     function girar(){
       var total = totalApostado();
       if (girando || total < 10 || total > saldo) return;
@@ -148,19 +195,13 @@ Juegos.registrar({
       enJuego = { apuestas: Object.assign({}, apuestas), apostado: total, sale: sale };
       saldo -= total; TP.guardar(saldo);
       estadoEl.textContent = "No va más…";
-      bola.textContent = "…"; bola.className = "resultado-rueda";
-      // Siempre gira hacia adelante y deja el número ganador bajo la flecha
-      var destino = ((-i * GRADOS) % 360 + 360) % 360, actual = ((giro % 360) + 360) % 360;
-      giro += (quieto ? 0 : 360 * 5) + ((destino - actual) + 360) % 360;
-      disco.style.transition = quieto ? "none" : "transform 3.4s cubic-bezier(.12,.6,.15,1)";
-      disco.style.transform = "rotate(" + giro + "deg)";
+      bola.textContent = "…"; bola.className = "resultado-rueda girando";
       pintar();
-      espera = setTimeout(function(){ resolver(false); }, quieto ? 50 : 3500);
+      animar(i, function(){ resolver(false); });
     }
 
     // silencioso: se cerró el juego a mitad del giro; solo se paga y se guarda
     function resolver(silencioso){
-      espera = null;
       var jugada = enJuego; enJuego = null;
       if (!jugada) return;
       var sale = jugada.sale, apostado = jugada.apostado, premio = 0, aciertos = [];
@@ -173,7 +214,7 @@ Juegos.registrar({
       TP.guardar(saldo);
       historial.unshift(sale); historial = historial.slice(0, 12); api.guardar("ruleta:historial", historial);
       if (silencioso){ if (neto >= 10) api.record("ruleta", neto, false); return; }
-      bola.textContent = String(sale); bola.className = "resultado-rueda " + color(sale);
+      bola.textContent = String(sale); bola.className = "resultado-rueda aparece " + color(sale);
       var nombreColor = { rojo: "rojo", negro: "negro", verde: "verde" }[color(sale)];
       var texto = "Salió el " + sale + " " + nombreColor + ". ";
       if (neto > 0) texto += "¡Ganas " + TP.texto(neto) + "! (" + aciertos.join(", ") + ")";
@@ -199,6 +240,6 @@ Juegos.registrar({
     document.addEventListener("keydown", tecla);
     estadoEl.textContent = "Elige una ficha, toca dónde apostar y gira.";
     pintar();
-    return function(){ document.removeEventListener("keydown", tecla); if (espera){ clearTimeout(espera); resolver(true); } };
+    return function(){ document.removeEventListener("keydown", tecla); if (anim){ cancelAnimationFrame(anim); anim = null; resolver(true); } };
   }
 });
